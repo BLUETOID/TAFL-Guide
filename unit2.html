@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit II: Regular Expressions and Languages - TAFL Study Guide</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="nav-header">
+        <nav class="nav-container">
+            <a href="index.html" class="nav-brand">TAFL Study Guide</a>
+            <div class="nav-links">
+                <a href="unit1.html">Unit I</a>
+                <a href="unit2.html" class="active">Unit II</a>
+                <a href="unit3.html">Unit III</a>
+                <a href="unit4.html">Unit IV</a>
+                <a href="unit5.html">Unit V</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="page-container">
+        <div class="content-wrapper">
+            <aside class="sidebar">
+                <nav class="sidebar-nav">
+                    <h3>Unit II Contents</h3>
+                    <ul>
+                        <li><a href="#regex-intro">2.1 Regular Expressions</a></li>
+                        <li><a href="#regex-syntax">2.2 RE Syntax and Semantics</a></li>
+                        <li><a href="#transition-graphs">2.3 Transition Graphs</a></li>
+                        <li><a href="#kleene">2.4 Kleene's Theorem</a></li>
+                        <li><a href="#arden">2.5 Arden's Theorem</a></li>
+                        <li><a href="#regular-nonregular">2.6 Regular vs Non-Regular</a></li>
+                        <li><a href="#closure">2.7 Closure Properties</a></li>
+                        <li><a href="#pigeonhole">2.8 Pigeonhole Principle</a></li>
+                        <li><a href="#pumping-lemma">2.9 Pumping Lemma</a></li>
+                        <li><a href="#decidability">2.10 Decidability</a></li>
+                        <li><a href="#summary">Unit Summary</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <article class="main-content">
+                <h1>Unit II: Regular Expressions and Languages</h1>
+
+                <!-- Section 2.1 -->
+                <section id="regex-intro">
+                    <h2>2.1 Introduction to Regular Expressions</h2>
+
+                    <p>Regular expressions provide an algebraic way to describe regular languages. While finite automata describe languages procedurally (how to recognize strings), regular expressions describe them declaratively (what patterns strings must match).</p>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Regular Expression</div>
+                        <p>A <strong>regular expression</strong> (RE) over an alphabet Sigma is a pattern that describes a set of strings - called the <strong>language</strong> of that regular expression.</p>
+                    </div>
+
+                    <p>Regular expressions are used extensively in:</p>
+                    <ul>
+                        <li>Text editors and IDEs (find and replace)</li>
+                        <li>Programming languages (pattern matching, input validation)</li>
+                        <li>Unix/Linux tools (grep, sed, awk)</li>
+                        <li>Lexical analysis in compilers</li>
+                        <li>Network packet filtering</li>
+                    </ul>
+                </section>
+
+                <!-- Section 2.2 -->
+                <section id="regex-syntax">
+                    <h2>2.2 Regular Expression Syntax and Semantics</h2>
+
+                    <h3>Base Cases</h3>
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Primitive Regular Expressions</div>
+                        <ul>
+                            <li><code>empty set</code> (or <code>phi</code>): The regex for the empty language. L(empty set) = {}</li>
+                            <li><code>epsilon</code>: The regex for the language containing only the empty string. L(epsilon) = {epsilon}</li>
+                            <li><code>a</code> (for any a in Sigma): The regex for the language containing only the single-symbol string a. L(a) = {a}</li>
+                        </ul>
+                    </div>
+
+                    <h3>Recursive Operators</h3>
+                    <p>If R and S are regular expressions, then:</p>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Operator</th>
+                                <th>Notation</th>
+                                <th>Language</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Union</td>
+                                <td><code>R + S</code> or <code>R | S</code></td>
+                                <td>L(R) U L(S)</td>
+                                <td>Strings in R or S (or both)</td>
+                            </tr>
+                            <tr>
+                                <td>Concatenation</td>
+                                <td><code>R . S</code> or <code>RS</code></td>
+                                <td>{xy : x in L(R), y in L(S)}</td>
+                                <td>String from R followed by string from S</td>
+                            </tr>
+                            <tr>
+                                <td>Kleene Star</td>
+                                <td><code>R*</code></td>
+                                <td>L(R)^0 U L(R)^1 U L(R)^2 U ...</td>
+                                <td>Zero or more repetitions of R</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Operator Precedence</h3>
+                    <p>From highest to lowest precedence:</p>
+                    <ol>
+                        <li><strong>Kleene Star (*)</strong> - highest</li>
+                        <li><strong>Concatenation (.)</strong></li>
+                        <li><strong>Union (+)</strong> - lowest</li>
+                    </ol>
+                    <p>Use parentheses to override precedence.</p>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: Regular Expression Interpretation</div>
+                        <ul>
+                            <li><code>ab*</code> means <code>a(b*)</code> = a followed by zero or more b's = {a, ab, abb, abbb, ...}</li>
+                            <li><code>(ab)*</code> = zero or more repetitions of ab = {epsilon, ab, abab, ababab, ...}</li>
+                            <li><code>a + bc</code> means <code>a + (bc)</code> = either a, or bc = {a, bc}</li>
+                            <li><code>(a + b)c</code> = ac or bc = {ac, bc}</li>
+                        </ul>
+                    </div>
+
+                    <h3>Common Extensions</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Notation</th>
+                                <th>Meaning</th>
+                                <th>Equivalent</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>R+</code></td>
+                                <td>One or more of R</td>
+                                <td><code>RR*</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>R?</code></td>
+                                <td>Zero or one of R</td>
+                                <td><code>epsilon + R</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>R^n</code></td>
+                                <td>Exactly n repetitions</td>
+                                <td><code>RRR...R</code> (n times)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: Regular Expressions for Common Languages</div>
+                        <p>Over Sigma = {0, 1}:</p>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Language</th>
+                                    <th>Regular Expression</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>All strings</td>
+                                    <td><code>(0 + 1)*</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Strings ending with 0</td>
+                                    <td><code>(0 + 1)*0</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Strings starting with 1</td>
+                                    <td><code>1(0 + 1)*</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Strings containing 01</td>
+                                    <td><code>(0 + 1)*01(0 + 1)*</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Strings of even length</td>
+                                    <td><code>((0 + 1)(0 + 1))*</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Strings with no two consecutive 1s</td>
+                                    <td><code>(0 + 10)*(1 + epsilon)</code></td>
+                                </tr>
+                                <tr>
+                                    <td>Strings with at least one 0</td>
+                                    <td><code>(0 + 1)*0(0 + 1)*</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Algebraic Laws for Regular Expressions</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Law</th>
+                                <th>Expression</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Union identity</td>
+                                <td><code>R + empty set = R</code></td>
+                            </tr>
+                            <tr>
+                                <td>Union commutativity</td>
+                                <td><code>R + S = S + R</code></td>
+                            </tr>
+                            <tr>
+                                <td>Union associativity</td>
+                                <td><code>(R + S) + T = R + (S + T)</code></td>
+                            </tr>
+                            <tr>
+                                <td>Union idempotence</td>
+                                <td><code>R + R = R</code></td>
+                            </tr>
+                            <tr>
+                                <td>Concatenation identity</td>
+                                <td><code>R . epsilon = epsilon . R = R</code></td>
+                            </tr>
+                            <tr>
+                                <td>Concatenation annihilator</td>
+                                <td><code>R . empty set = empty set . R = empty set</code></td>
+                            </tr>
+                            <tr>
+                                <td>Concatenation associativity</td>
+                                <td><code>(RS)T = R(ST)</code></td>
+                            </tr>
+                            <tr>
+                                <td>Distributivity</td>
+                                <td><code>R(S + T) = RS + RT</code> and <code>(S + T)R = SR + TR</code></td>
+                            </tr>
+                            <tr>
+                                <td>Kleene star of empty</td>
+                                <td><code>(empty set)* = epsilon</code></td>
+                            </tr>
+                            <tr>
+                                <td>Kleene star idempotence</td>
+                                <td><code>(R*)* = R*</code></td>
+                            </tr>
+                            <tr>
+                                <td>Kleene star expansion</td>
+                                <td><code>R* = epsilon + RR*</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="warning-box">
+                        <div class="box-title">Common Mistakes</div>
+                        <ul>
+                            <li>Confusing <code>R*</code> (zero or more) with <code>R+</code> (one or more)</li>
+                            <li>Forgetting that concatenation is NOT commutative: <code>ab != ba</code></li>
+                            <li>Misapplying precedence: <code>a + b* = a + (b*)</code>, not <code>(a + b)*</code></li>
+                            <li>Writing <code>(a*)*</code> when <code>a*</code> is sufficient</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Section 2.3 -->
+                <section id="transition-graphs">
+                    <h2>2.3 Transition Graphs</h2>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Transition Graph</div>
+                        <p>A <strong>transition graph</strong> (or generalized NFA) is like an NFA but allows:</p>
+                        <ul>
+                            <li>Transitions labeled with regular expressions (not just single symbols)</li>
+                            <li>Multiple initial states</li>
+                            <li>Multiple final states</li>
+                        </ul>
+                    </div>
+
+                    <p>Transition graphs are used as an intermediate representation when converting between finite automata and regular expressions. They provide a more flexible notation that can be systematically simplified.</p>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: Transition Graph</div>
+                        <div class="diagram-container">
+                            <svg width="350" height="120" viewBox="0 0 350 120">
+                                <!-- Initial arrow -->
+                                <line x1="10" y1="60" x2="38" y2="60" stroke="#1a365d" stroke-width="2" marker-end="url(#arrowheadTG)"/>
+
+                                <!-- State q0 -->
+                                <circle cx="70" cy="60" r="25" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="70" y="65" text-anchor="middle" font-family="Georgia" font-size="14">q0</text>
+
+                                <!-- State q1 (final) -->
+                                <circle cx="280" cy="60" r="25" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <circle cx="280" cy="60" r="20" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="280" y="65" text-anchor="middle" font-family="Georgia" font-size="14">q1</text>
+
+                                <!-- q0 to q1 labeled with (a+b)*ab -->
+                                <path d="M 95 60 L 252 60" fill="none" stroke="#1a365d" stroke-width="2" marker-end="url(#arrowheadTG)"/>
+                                <text x="175" y="50" text-anchor="middle" font-family="monospace" font-size="11">(a+b)*ab</text>
+
+                                <!-- Arrow marker -->
+                                <defs>
+                                    <marker id="arrowheadTG" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                        <polygon points="0 0, 10 3.5, 0 7" fill="#1a365d"/>
+                                    </marker>
+                                </defs>
+                            </svg>
+                            <p class="diagram-caption">Figure 2.1: Transition graph with regex-labeled edge</p>
+                        </div>
+                        <p>This transition graph accepts exactly the strings in L((a+b)*ab) - strings ending with "ab".</p>
+                    </div>
+                </section>
+
+                <!-- Section 2.4 -->
+                <section id="kleene">
+                    <h2>2.4 Kleene's Theorem</h2>
+
+                    <div class="theorem-box">
+                        <div class="box-title">Theorem: Kleene's Theorem</div>
+                        <p>A language is <strong>regular</strong> if and only if it can be described by a regular expression. Equivalently:</p>
+                        <ul>
+                            <li>For every DFA (or NFA), there exists an equivalent regular expression</li>
+                            <li>For every regular expression, there exists an equivalent DFA (or NFA)</li>
+                        </ul>
+                        <p>This establishes that finite automata and regular expressions have exactly the same expressive power.</p>
+                    </div>
+
+                    <h3>Converting Regular Expression to NFA (Thompson's Construction)</h3>
+                    <p>Every regular expression can be converted to an epsilon-NFA using structural induction:</p>
+
+                    <div class="algorithm">
+                        <div class="algorithm-title">Thompson's Construction Rules</div>
+
+                        <p><strong>Base Cases:</strong></p>
+                        <div class="diagram-container">
+                            <svg width="500" height="180" viewBox="0 0 500 180">
+                                <!-- Empty set -->
+                                <text x="10" y="25" font-family="Georgia" font-size="12">For empty set:</text>
+                                <line x1="80" y1="40" x2="105" y2="40" stroke="#1a365d" stroke-width="2" marker-end="url(#arrowheadK1)"/>
+                                <circle cx="130" cy="40" r="18" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="130" y="45" text-anchor="middle" font-size="10">start</text>
+                                <circle cx="200" cy="40" r="18" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <circle cx="200" cy="40" r="14" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="200" y="45" text-anchor="middle" font-size="10">end</text>
+                                <text x="240" y="45" font-family="monospace" font-size="10">(no transition)</text>
+
+                                <!-- Epsilon -->
+                                <text x="10" y="85" font-family="Georgia" font-size="12">For epsilon:</text>
+                                <line x1="80" y1="100" x2="105" y2="100" stroke="#1a365d" stroke-width="2" marker-end="url(#arrowheadK1)"/>
+                                <circle cx="130" cy="100" r="18" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <path d="M 148 100 L 175 100" fill="none" stroke="#1a365d" stroke-width="2" marker-end="url(#arrowheadK1)"/>
+                                <text x="162" y="92" text-anchor="middle" font-family="Georgia" font-size="10" font-style="italic">e</text>
+                                <circle cx="200" cy="100" r="18" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <circle cx="200" cy="100" r="14" fill="white" stroke="#1a365d" stroke-width="2"/>
+
+                                <!-- Symbol a -->
+                                <text x="10" y="145" font-family="Georgia" font-size="12">For symbol a:</text>
+                                <line x1="80" y1="160" x2="105" y2="160" stroke="#1a365d" stroke-width="2" marker-end="url(#arrowheadK1)"/>
+                                <circle cx="130" cy="160" r="18" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <path d="M 148 160 L 175 160" fill="none" stroke="#1a365d" stroke-width="2" marker-end="url(#arrowheadK1)"/>
+                                <text x="162" y="152" text-anchor="middle" font-family="monospace" font-size="10">a</text>
+                                <circle cx="200" cy="160" r="18" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <circle cx="200" cy="160" r="14" fill="white" stroke="#1a365d" stroke-width="2"/>
+
+                                <defs>
+                                    <marker id="arrowheadK1" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                        <polygon points="0 0, 10 3.5, 0 7" fill="#1a365d"/>
+                                    </marker>
+                                </defs>
+                            </svg>
+                        </div>
+
+                        <p><strong>Inductive Cases:</strong></p>
+                        <p>If N(R) and N(S) are NFAs for R and S respectively:</p>
+                        <ul>
+                            <li><strong>Union (R + S):</strong> New start state with epsilon-transitions to starts of N(R) and N(S); their final states have epsilon-transitions to a new final state</li>
+                            <li><strong>Concatenation (RS):</strong> Final state of N(R) has epsilon-transition to start of N(S)</li>
+                            <li><strong>Kleene Star (R*):</strong> New start (also final) with epsilon to N(R)'s start; N(R)'s final has epsilon back to N(R)'s start and to new final</li>
+                        </ul>
+                    </div>
+
+                    <h3>Converting FA to Regular Expression (State Elimination)</h3>
+                    <div class="algorithm">
+                        <div class="algorithm-title">State Elimination Method</div>
+                        <ol>
+                            <li>Create a generalized NFA with a single start state and single final state</li>
+                            <li>Eliminate intermediate states one by one</li>
+                            <li>When eliminating a state, update the labels on parallel edges using:
+                                <br>If path goes p --R1--> q --R2--> r with q having self-loop R3:
+                                <br>Replace with p --R1(R3)*R2--> r</li>
+                            <li>When only start and final states remain, the label on the edge is the RE</li>
+                        </ol>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: DFA to Regular Expression</div>
+                        <p>Convert this DFA to a regular expression:</p>
+
+                        <div class="diagram-container">
+                            <svg width="280" height="100" viewBox="0 0 280 100">
+                                <line x1="10" y1="50" x2="35" y2="50" stroke="#1a365d" stroke-width="2" marker-end="url(#arrowheadK2)"/>
+                                <circle cx="60" cy="50" r="20" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="60" y="55" text-anchor="middle" font-family="Georgia" font-size="12">A</text>
+
+                                <circle cx="160" cy="50" r="20" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <circle cx="160" cy="50" r="16" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="160" y="55" text-anchor="middle" font-family="Georgia" font-size="12">B</text>
+
+                                <path d="M 80 50 L 136 50" fill="none" stroke="#1a365d" stroke-width="2" marker-end="url(#arrowheadK2)"/>
+                                <text x="108" y="42" text-anchor="middle" font-family="monospace" font-size="11">a</text>
+
+                                <path d="M 50 32 C 35 5, 85 5, 70 32" fill="none" stroke="#1a365d" stroke-width="2" marker-end="url(#arrowheadK2)"/>
+                                <text x="60" y="10" text-anchor="middle" font-family="monospace" font-size="11">b</text>
+
+                                <path d="M 150 32 C 135 5, 185 5, 170 32" fill="none" stroke="#1a365d" stroke-width="2" marker-end="url(#arrowheadK2)"/>
+                                <text x="160" y="10" text-anchor="middle" font-family="monospace" font-size="11">a, b</text>
+
+                                <defs>
+                                    <marker id="arrowheadK2" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                        <polygon points="0 0, 10 3.5, 0 7" fill="#1a365d"/>
+                                    </marker>
+                                </defs>
+                            </svg>
+                        </div>
+
+                        <p><strong>State Elimination:</strong></p>
+                        <p>We need to find paths from A (start) to B (final).</p>
+                        <ul>
+                            <li>From A with self-loop b: Can do b* before leaving A</li>
+                            <li>Transition A to B: labeled a</li>
+                            <li>B has self-loop a+b</li>
+                        </ul>
+                        <p>Regular expression: <code>b*a(a+b)*</code></p>
+                    </div>
+
+                    <div class="exam-tip-box">
+                        <div class="box-title">Exam Tip</div>
+                        <p>When converting DFA to RE using state elimination:</p>
+                        <ol>
+                            <li>Add a new unique start state with epsilon to old start</li>
+                            <li>Add a new unique final state with epsilon from old finals</li>
+                            <li>Eliminate states one by one (usually eliminate states with fewer edges first)</li>
+                            <li>Keep track of all paths and combine using + for parallel paths</li>
+                        </ol>
+                    </div>
+                </section>
+
+                <!-- Section 2.5 -->
+                <section id="arden">
+                    <h2>2.5 Arden's Theorem</h2>
+
+                    <div class="theorem-box">
+                        <div class="box-title">Theorem: Arden's Theorem</div>
+                        <p>If P and Q are regular expressions over alphabet Sigma, and P does not contain epsilon, then the equation:</p>
+                        <p class="formal-def"><code>R = Q + RP</code></p>
+                        <p>has a unique solution:</p>
+                        <p class="formal-def"><code>R = QP*</code></p>
+                    </div>
+
+                    <div class="note-box">
+                        <div class="box-title">Understanding Arden's Theorem</div>
+                        <p>The equation R = Q + RP means: "R consists of strings that are either in Q, or are a string from R followed by a string from P."</p>
+                        <p>This is solved by: "Start with Q, then append any number of strings from P."</p>
+                        <p>The condition "P does not contain epsilon" ensures the solution is unique.</p>
+                    </div>
+
+                    <h3>Using Arden's Theorem to Convert FA to RE</h3>
+                    <div class="algorithm">
+                        <div class="algorithm-title">Algorithm: Arden's Method for FA to RE Conversion</div>
+                        <ol>
+                            <li>Write a system of equations, one for each state</li>
+                            <li>For each state qi, write: qi = (sum of incoming transitions)</li>
+                            <li>The start state equation includes epsilon (or initial contribution)</li>
+                            <li>Solve the system using substitution and Arden's theorem</li>
+                            <li>The RE is the union of expressions for all final states</li>
+                        </ol>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: Using Arden's Theorem</div>
+                        <p>Find the RE for this DFA using Arden's method:</p>
+
+                        <table class="transition-table">
+                            <thead>
+                                <tr>
+                                    <th>State</th>
+                                    <th>a</th>
+                                    <th>b</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="state-initial">q0</td>
+                                    <td>q1</td>
+                                    <td>q0</td>
+                                </tr>
+                                <tr>
+                                    <td class="state-final">q1</td>
+                                    <td>q1</td>
+                                    <td>q0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p><strong>Step 1: Write equations</strong></p>
+                        <pre>
+q0 = epsilon + q0.b + q1.b   (start state gets epsilon; incoming from q0 on b, q1 on b)
+q1 = q0.a + q1.a            (incoming from q0 on a, q1 on a)</pre>
+
+                        <p><strong>Step 2: Solve for q1 using Arden's theorem</strong></p>
+                        <pre>
+q1 = q0.a + q1.a
+q1 = q0.a + q1.a         (form: R = Q + RP where Q = q0.a, P = a)
+q1 = q0.a.a*             (by Arden's theorem)
+q1 = q0.aa*</pre>
+
+                        <p><strong>Step 3: Substitute into q0 equation</strong></p>
+                        <pre>
+q0 = epsilon + q0.b + q1.b
+q0 = epsilon + q0.b + q0.aa*.b
+q0 = epsilon + q0.(b + aa*b)
+q0 = epsilon + q0.(b + aa*b)   (form: R = Q + RP where Q = epsilon, P = b + aa*b)
+q0 = epsilon.(b + aa*b)*
+q0 = (b + aa*b)*</pre>
+
+                        <p><strong>Step 4: Find q1 (final state)</strong></p>
+                        <pre>
+q1 = q0.aa*
+q1 = (b + aa*b)*.aa*</pre>
+
+                        <p><strong>Final RE:</strong> <code>(b + aa*b)*aa*</code> or equivalently <code>b*a(a + bb*a)*</code></p>
+                        <p>This represents all strings that end with at least one 'a'.</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Solved Problem: Arden's Theorem</div>
+                        <p>Find RE for L = {w in {a,b}* : w contains "aa" as substring}</p>
+
+                        <p><strong>First, design a DFA:</strong></p>
+                        <ul>
+                            <li>q0: Initial, haven't seen any progress toward "aa"</li>
+                            <li>q1: Just saw one 'a'</li>
+                            <li>q2: Saw "aa" (final, trap state)</li>
+                        </ul>
+
+                        <table class="transition-table">
+                            <thead>
+                                <tr><th>State</th><th>a</th><th>b</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="state-initial">q0</td><td>q1</td><td>q0</td></tr>
+                                <tr><td>q1</td><td>q2</td><td>q0</td></tr>
+                                <tr><td class="state-final">q2</td><td>q2</td><td>q2</td></tr>
+                            </tbody>
+                        </table>
+
+                        <p><strong>Equations:</strong></p>
+                        <pre>
+q0 = epsilon + q0.b + q1.b
+q1 = q0.a
+q2 = q1.a + q2.a + q2.b = q1.a + q2.(a+b)</pre>
+
+                        <p><strong>Solving:</strong></p>
+                        <pre>
+From q2: q2 = q1.a.(a+b)*
+
+Substitute q1 = q0.a:
+q2 = q0.a.a.(a+b)* = q0.aa(a+b)*
+
+Now solve q0:
+q0 = epsilon + q0.b + q1.b = epsilon + q0.b + q0.a.b = epsilon + q0.(b + ab)
+q0 = (b + ab)*
+
+Therefore:
+q2 = (b + ab)*.aa.(a+b)*</pre>
+
+                        <p><strong>Final RE:</strong> <code>(b + ab)*aa(a+b)*</code></p>
+                    </div>
+
+                    <div class="warning-box">
+                        <div class="box-title">Common Mistake</div>
+                        <p>When setting up equations, ensure you account for:</p>
+                        <ul>
+                            <li>The start state includes epsilon (representing being at start with no input)</li>
+                            <li>All incoming transitions to each state</li>
+                            <li>The direction of edges (use the arriving symbol, not departing)</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Section 2.6 -->
+                <section id="regular-nonregular">
+                    <h2>2.6 Regular vs Non-Regular Languages</h2>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Regular Language</div>
+                        <p>A language is <strong>regular</strong> if it can be recognized by a DFA (equivalently: NFA, epsilon-NFA, or described by a regular expression).</p>
+                    </div>
+
+                    <h3>Examples of Regular Languages</h3>
+                    <ul>
+                        <li>Any finite language</li>
+                        <li>Strings with fixed pattern (ending with X, starting with Y, containing Z)</li>
+                        <li>Strings with properties countable modulo k (even length, odd number of 0s)</li>
+                        <li>Bounded repetition patterns</li>
+                    </ul>
+
+                    <h3>Examples of Non-Regular Languages</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Language</th>
+                                <th>Why Non-Regular</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{a^n b^n : n >= 0}</td>
+                                <td>Requires counting unboundedly to match a's and b's</td>
+                            </tr>
+                            <tr>
+                                <td>{ww : w in Sigma*}</td>
+                                <td>Requires remembering entire first half</td>
+                            </tr>
+                            <tr>
+                                <td>{a^(n^2) : n >= 0}</td>
+                                <td>Requires computing squares</td>
+                            </tr>
+                            <tr>
+                                <td>{a^p : p is prime}</td>
+                                <td>Requires primality testing</td>
+                            </tr>
+                            <tr>
+                                <td>{a^n b^m : n != m}</td>
+                                <td>Requires comparing counts</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="note-box">
+                        <div class="box-title">Intuition for Non-Regularity</div>
+                        <p>A language is typically non-regular if it requires:</p>
+                        <ul>
+                            <li>Unbounded counting (matching counts exactly)</li>
+                            <li>Remembering arbitrary-length substrings</li>
+                            <li>Complex arithmetic relationships between parts of the string</li>
+                        </ul>
+                        <p>DFAs have finite memory (finite states), so they cannot handle unbounded information.</p>
+                    </div>
+                </section>
+
+                <!-- Section 2.7 -->
+                <section id="closure">
+                    <h2>2.7 Closure Properties of Regular Languages</h2>
+
+                    <div class="theorem-box">
+                        <div class="box-title">Theorem: Closure Properties</div>
+                        <p>Regular languages are closed under the following operations (if L1 and L2 are regular, so is the result):</p>
+                    </div>
+
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Operation</th>
+                                <th>Notation</th>
+                                <th>Closed?</th>
+                                <th>Construction Method</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Union</td>
+                                <td>L1 U L2</td>
+                                <td>Yes</td>
+                                <td>NFA with epsilon to both start states</td>
+                            </tr>
+                            <tr>
+                                <td>Intersection</td>
+                                <td>L1 intersection L2</td>
+                                <td>Yes</td>
+                                <td>Product construction DFA</td>
+                            </tr>
+                            <tr>
+                                <td>Complement</td>
+                                <td>L'</td>
+                                <td>Yes</td>
+                                <td>Swap final and non-final states in DFA</td>
+                            </tr>
+                            <tr>
+                                <td>Concatenation</td>
+                                <td>L1 . L2</td>
+                                <td>Yes</td>
+                                <td>NFA: L1 finals -> epsilon -> L2 start</td>
+                            </tr>
+                            <tr>
+                                <td>Kleene Star</td>
+                                <td>L*</td>
+                                <td>Yes</td>
+                                <td>NFA with epsilon loops</td>
+                            </tr>
+                            <tr>
+                                <td>Reversal</td>
+                                <td>L^R</td>
+                                <td>Yes</td>
+                                <td>Reverse all edges, swap start/final</td>
+                            </tr>
+                            <tr>
+                                <td>Difference</td>
+                                <td>L1 - L2</td>
+                                <td>Yes</td>
+                                <td>L1 intersection L2' (using other closures)</td>
+                            </tr>
+                            <tr>
+                                <td>Homomorphism</td>
+                                <td>h(L)</td>
+                                <td>Yes</td>
+                                <td>Replace symbols in NFA edges</td>
+                            </tr>
+                            <tr>
+                                <td>Inverse Homomorphism</td>
+                                <td>h^(-1)(L)</td>
+                                <td>Yes</td>
+                                <td>Precompute DFA transitions for h(a)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Product Construction for Intersection</h3>
+                    <div class="algorithm">
+                        <div class="algorithm-title">Algorithm: Product Construction</div>
+                        <p>Given DFAs M1 = (Q1, Sigma, delta1, q1, F1) and M2 = (Q2, Sigma, delta2, q2, F2):</p>
+                        <p>Build M = (Q1 x Q2, Sigma, delta, (q1, q2), F1 x F2) where:</p>
+                        <ul>
+                            <li>States are pairs (p, q) with p in Q1 and q in Q2</li>
+                            <li>delta((p, q), a) = (delta1(p, a), delta2(q, a))</li>
+                            <li>Final states: {(p, q) : p in F1 AND q in F2}</li>
+                        </ul>
+                        <p>For union: Final states = {(p, q) : p in F1 OR q in F2}</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: Using Closure Properties</div>
+                        <p>Prove that L = {w : w has even length AND w contains "01"} is regular.</p>
+
+                        <p><strong>Solution:</strong></p>
+                        <ol>
+                            <li>L1 = {w : w has even length} is regular (2-state DFA alternating)</li>
+                            <li>L2 = {w : w contains "01"} is regular (3-state NFA)</li>
+                            <li>L = L1 intersection L2</li>
+                            <li>Since regular languages are closed under intersection, L is regular.</li>
+                        </ol>
+                    </div>
+
+                    <div class="exam-tip-box">
+                        <div class="box-title">Exam Tip: Using Closure for Proofs</div>
+                        <p>Closure properties can be used to:</p>
+                        <ul>
+                            <li><strong>Prove regularity:</strong> Show L is built from regular languages using closed operations</li>
+                            <li><strong>Prove non-regularity:</strong> If L1 is regular and L1 intersection L2 is non-regular, then L2 must be non-regular</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Section 2.8 -->
+                <section id="pigeonhole">
+                    <h2>2.8 Pigeonhole Principle in Automata</h2>
+
+                    <div class="theorem-box">
+                        <div class="box-title">Pigeonhole Principle</div>
+                        <p>If n+1 pigeons are placed into n pigeonholes, at least one pigeonhole contains more than one pigeon.</p>
+                    </div>
+
+                    <h3>Application to Finite Automata</h3>
+                    <p>For a DFA with n states processing a string of length >= n:</p>
+                    <ul>
+                        <li>The DFA visits at least n+1 states (including the start)</li>
+                        <li>By the pigeonhole principle, some state must be visited twice</li>
+                        <li>This creates a "loop" in the computation</li>
+                    </ul>
+
+                    <div class="note-box">
+                        <div class="box-title">Key Insight</div>
+                        <p>If a DFA accepts a string of length >= n states, it must have a loop. This loop can be:</p>
+                        <ul>
+                            <li>Removed (pumped 0 times) - still accepted</li>
+                            <li>Repeated (pumped i times) - still accepted</li>
+                        </ul>
+                        <p>This is the foundation of the Pumping Lemma.</p>
+                    </div>
+                </section>
+
+                <!-- Section 2.9 -->
+                <section id="pumping-lemma">
+                    <h2>2.9 Pumping Lemma for Regular Languages</h2>
+
+                    <div class="theorem-box">
+                        <div class="box-title">Theorem: Pumping Lemma for Regular Languages</div>
+                        <p>If L is a regular language, then there exists a positive integer p (the pumping length) such that for every string w in L with |w| >= p, w can be written as w = xyz where:</p>
+                        <ol>
+                            <li><code>|y| > 0</code> (y is non-empty)</li>
+                            <li><code>|xy| <= p</code> (the loop is in the first p characters)</li>
+                            <li><code>xy^i z in L for all i >= 0</code> (can pump y any number of times)</li>
+                        </ol>
+                    </div>
+
+                    <div class="note-box">
+                        <div class="box-title">Understanding the Pumping Lemma</div>
+                        <ul>
+                            <li>The pumping length p can be taken as the number of states in a DFA for L</li>
+                            <li>The substring y corresponds to the loop in the DFA</li>
+                            <li>xy^0z (removing y) and xy^2z, xy^3z, ... (repeating y) must all be in L</li>
+                        </ul>
+                    </div>
+
+                    <h3>Using Pumping Lemma to Prove Non-Regularity</h3>
+                    <div class="algorithm">
+                        <div class="algorithm-title">Proof Template: Pumping Lemma Argument</div>
+                        <ol>
+                            <li>Assume L is regular (proof by contradiction)</li>
+                            <li>Let p be the pumping length (exists by the lemma)</li>
+                            <li>Choose a string w in L with |w| >= p (must choose wisely!)</li>
+                            <li>Consider all possible ways to write w = xyz satisfying conditions 1 and 2</li>
+                            <li>Show that for each such decomposition, there exists i >= 0 such that xy^i z is NOT in L</li>
+                            <li>This contradicts condition 3, so L is not regular</li>
+                        </ol>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example 1: Prove {a^n b^n : n >= 0} is not regular</div>
+
+                        <p><strong>Proof:</strong></p>
+                        <ol>
+                            <li>Assume L = {a^n b^n : n >= 0} is regular.</li>
+                            <li>Let p be the pumping length.</li>
+                            <li>Choose w = a^p b^p. Note: w is in L and |w| = 2p >= p.</li>
+                            <li>By the pumping lemma, w = xyz where |xy| <= p and |y| > 0.
+                                <br>Since |xy| <= p and w starts with p a's, both x and y consist only of a's.
+                                <br>Let y = a^k for some k > 0.</li>
+                            <li>Consider xy^2z = a^(p+k) b^p.
+                                <br>Since k > 0, we have p+k != p, so a^(p+k) b^p is NOT in L.</li>
+                            <li>This contradicts condition 3 of the pumping lemma.</li>
+                            <li>Therefore, L is not regular.</li>
+                        </ol>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example 2: Prove {ww : w in {a,b}*} is not regular</div>
+
+                        <p><strong>Proof:</strong></p>
+                        <ol>
+                            <li>Assume L = {ww : w in {a,b}*} is regular.</li>
+                            <li>Let p be the pumping length.</li>
+                            <li>Choose w = a^p b a^p b. Note: this is (a^p b)(a^p b), which is in L.</li>
+                            <li>By the pumping lemma, w = xyz where |xy| <= p and |y| > 0.
+                                <br>Since |xy| <= p and w starts with p a's, y = a^k for some k > 0.</li>
+                            <li>Consider xy^0z = a^(p-k) b a^p b.
+                                <br>For this to be in L (of form uu), we need a^(p-k) b = a^p b or some valid split.
+                                <br>Since p-k != p (as k > 0), and the b positions don't align, this is NOT in L.</li>
+                            <li>Contradiction. L is not regular.</li>
+                        </ol>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example 3: Prove {a^(n^2) : n >= 0} is not regular</div>
+
+                        <p><strong>Proof:</strong></p>
+                        <ol>
+                            <li>Assume L = {a^(n^2) : n >= 0} is regular.</li>
+                            <li>Let p be the pumping length.</li>
+                            <li>Choose w = a^(p^2). Note: |w| = p^2 >= p.</li>
+                            <li>By the pumping lemma, w = xyz where |y| = k > 0 and |xy| <= p.</li>
+                            <li>Consider xy^2z. Its length is p^2 + k.
+                                <br>We have p^2 < p^2 + k <= p^2 + p < p^2 + 2p + 1 = (p+1)^2.
+                                <br>So p^2 + k is strictly between p^2 and (p+1)^2, meaning it's NOT a perfect square.</li>
+                            <li>Thus xy^2z is NOT in L. Contradiction.</li>
+                            <li>L is not regular.</li>
+                        </ol>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example 4: Prove {a^n : n is prime} is not regular</div>
+
+                        <p><strong>Proof:</strong></p>
+                        <ol>
+                            <li>Assume L = {a^n : n is prime} is regular.</li>
+                            <li>Let p be the pumping length.</li>
+                            <li>Choose a prime q >= p + 2. Let w = a^q. Note: w is in L and |w| = q >= p.</li>
+                            <li>By the pumping lemma, w = xyz where |y| = k > 0 and |xy| <= p.</li>
+                            <li>Consider xy^(q+1)z. Its length is q + qk = q(1 + k).</li>
+                            <li>Since q > 1 and 1 + k > 1 (because k >= 1), the length q(1+k) is composite (not prime).</li>
+                            <li>Thus xy^(q+1)z is NOT in L. Contradiction.</li>
+                            <li>L is not regular.</li>
+                        </ol>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example 5: Prove {0^n 1^m : n > m} is not regular</div>
+
+                        <p><strong>Proof:</strong></p>
+                        <ol>
+                            <li>Assume L = {0^n 1^m : n > m} is regular.</li>
+                            <li>Let p be the pumping length.</li>
+                            <li>Choose w = 0^(p+1) 1^p. Note: p+1 > p, so w is in L, and |w| = 2p+1 >= p.</li>
+                            <li>By the pumping lemma, w = xyz where |xy| <= p and |y| > 0.
+                                <br>Since |xy| <= p and w starts with p+1 zeros, y = 0^k for some k > 0.</li>
+                            <li>Consider xy^0z = 0^(p+1-k) 1^p.
+                                <br>We need p+1-k > p, i.e., k < 1.
+                                <br>But k >= 1, so p+1-k <= p, meaning the number of 0s is at most the number of 1s.</li>
+                            <li>Thus xy^0z is NOT in L. Contradiction.</li>
+                            <li>L is not regular.</li>
+                        </ol>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example 6: Prove L = {w in {a,b}* : #a(w) = #b(w)} is not regular</div>
+
+                        <p><strong>Proof:</strong></p>
+                        <ol>
+                            <li>Assume L is regular.</li>
+                            <li>Let p be the pumping length.</li>
+                            <li>Choose w = a^p b^p. Note: #a(w) = #b(w) = p, so w is in L.</li>
+                            <li>By the pumping lemma, w = xyz where |xy| <= p and |y| > 0.
+                                <br>Since |xy| <= p and w starts with p a's, y = a^k for some k > 0.</li>
+                            <li>Consider xy^2z = a^(p+k) b^p.
+                                <br>#a = p+k and #b = p. Since k > 0, #a != #b.</li>
+                            <li>Thus xy^2z is NOT in L. Contradiction.</li>
+                            <li>L is not regular.</li>
+                        </ol>
+                    </div>
+
+                    <div class="warning-box">
+                        <div class="box-title">Common Mistakes with Pumping Lemma</div>
+                        <ul>
+                            <li><strong>Wrong direction:</strong> The pumping lemma proves non-regularity. It CANNOT prove regularity (the converse is false).</li>
+                            <li><strong>Choosing the decomposition:</strong> You do NOT get to choose xyz. You must consider ALL valid decompositions.</li>
+                            <li><strong>Choosing the string:</strong> You DO get to choose w. Choose it cleverly to make the proof work.</li>
+                            <li><strong>Forgetting |xy| <= p:</strong> This constraint often determines what y can be.</li>
+                            <li><strong>Not considering all i:</strong> You need to find ONE value of i that fails. Usually i=0 or i=2 works.</li>
+                        </ul>
+                    </div>
+
+                    <div class="exam-tip-box">
+                        <div class="box-title">Strategy for Choosing w</div>
+                        <ul>
+                            <li>Choose w with a structure that makes y's position predictable</li>
+                            <li>Often w = a^p (something) works well because y must be all a's</li>
+                            <li>Make sure clearly in L before pumping</li>
+                            <li>The structure should break easily when y is pumped</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Section 2.10 -->
+                <section id="decidability">
+                    <h2>2.10 Decidability and Decision Properties</h2>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Decidable Problem</div>
+                        <p>A problem is <strong>decidable</strong> if there exists an algorithm that always terminates and correctly answers "yes" or "no" for every instance of the problem.</p>
+                    </div>
+
+                    <h3>Decision Problems for Regular Languages</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Problem</th>
+                                <th>Question</th>
+                                <th>Decidable?</th>
+                                <th>Algorithm</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Membership</td>
+                                <td>Is w in L(M)?</td>
+                                <td>Yes</td>
+                                <td>Simulate DFA on w</td>
+                            </tr>
+                            <tr>
+                                <td>Emptiness</td>
+                                <td>Is L(M) = empty set?</td>
+                                <td>Yes</td>
+                                <td>Check if any final state is reachable from start</td>
+                            </tr>
+                            <tr>
+                                <td>Finiteness</td>
+                                <td>Is L(M) finite?</td>
+                                <td>Yes</td>
+                                <td>Check for cycles on paths to final states</td>
+                            </tr>
+                            <tr>
+                                <td>Universality</td>
+                                <td>Is L(M) = Sigma*?</td>
+                                <td>Yes</td>
+                                <td>Check if L(M)' = empty set</td>
+                            </tr>
+                            <tr>
+                                <td>Equivalence</td>
+                                <td>Is L(M1) = L(M2)?</td>
+                                <td>Yes</td>
+                                <td>Check (L1 - L2) U (L2 - L1) = empty set</td>
+                            </tr>
+                            <tr>
+                                <td>Containment</td>
+                                <td>Is L(M1) subset of L(M2)?</td>
+                                <td>Yes</td>
+                                <td>Check L1 intersection L2' = empty set</td>
+                            </tr>
+                            <tr>
+                                <td>Minimality</td>
+                                <td>Is M minimal?</td>
+                                <td>Yes</td>
+                                <td>Compare with minimized version</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="algorithm">
+                        <div class="algorithm-title">Algorithm: Testing Emptiness</div>
+                        <ol>
+                            <li>Start from the initial state</li>
+                            <li>Use BFS/DFS to find all reachable states</li>
+                            <li>If any reachable state is a final state, L(M) is non-empty</li>
+                            <li>Otherwise, L(M) = empty set</li>
+                        </ol>
+                        <p>Time complexity: O(|Q| + |delta|)</p>
+                    </div>
+
+                    <div class="algorithm">
+                        <div class="algorithm-title">Algorithm: Testing Equivalence</div>
+                        <ol>
+                            <li>Minimize both DFAs</li>
+                            <li>Check if the minimal DFAs are isomorphic (same structure)</li>
+                            <li>Alternative: Check (L1 intersection L2') U (L1' intersection L2) = empty set using product construction</li>
+                        </ol>
+                    </div>
+
+                    <div class="note-box">
+                        <div class="box-title">Finiteness Testing</div>
+                        <p>L(M) is infinite if and only if:</p>
+                        <ul>
+                            <li>There exists a cycle in the DFA</li>
+                            <li>The cycle is reachable from the start state</li>
+                            <li>A final state is reachable from the cycle</li>
+                        </ul>
+                        <p>This can be detected by finding strongly connected components or by checking if M accepts any string w with n <= |w| < 2n (where n = number of states).</p>
+                    </div>
+
+                    <div class="exam-tip-box">
+                        <div class="box-title">Exam Tip</div>
+                        <p>All basic decision problems for regular languages are decidable. This is in contrast to context-free and context-sensitive languages where many problems become undecidable. Remember this distinction for comparative questions.</p>
+                    </div>
+                </section>
+
+                <!-- Unit Summary -->
+                <section id="summary" class="unit-summary">
+                    <h2>Unit II Summary</h2>
+
+                    <h3>Key Results</h3>
+                    <ul class="key-results">
+                        <li>Regular expressions and finite automata have equal expressive power (Kleene's Theorem)</li>
+                        <li>Arden's Theorem: R = Q + RP has solution R = QP* (when P lacks epsilon)</li>
+                        <li>Regular languages are closed under union, intersection, complement, concatenation, Kleene star, reversal</li>
+                        <li>Pumping Lemma: Long strings in regular languages have pumpable substrings</li>
+                        <li>All basic decision problems for regular languages are decidable</li>
+                    </ul>
+
+                    <h3>Exam-Important Formulas</h3>
+                    <ul>
+                        <li><strong>RE Precedence:</strong> * (highest) > concatenation > + (lowest)</li>
+                        <li><strong>Arden's Theorem:</strong> R = Q + RP => R = QP*</li>
+                        <li><strong>Pumping conditions:</strong> |y| > 0, |xy| <= p, xy^i z in L for all i >= 0</li>
+                    </ul>
+
+                    <h3>Algorithms to Know</h3>
+                    <ul>
+                        <li>Thompson's Construction (RE to epsilon-NFA)</li>
+                        <li>State Elimination (FA to RE)</li>
+                        <li>Arden's Method (FA to RE using equations)</li>
+                        <li>Product Construction (intersection/union of DFAs)</li>
+                        <li>Pumping Lemma proof structure</li>
+                    </ul>
+
+                    <h3>Common Mistakes to Avoid</h3>
+                    <ul class="common-mistakes">
+                        <li>Misunderstanding RE precedence (a+b* vs (a+b)*)</li>
+                        <li>Using pumping lemma to "prove" regularity (it only disproves)</li>
+                        <li>In pumping proofs, trying to choose the decomposition (adversary chooses it)</li>
+                        <li>Forgetting the |xy| <= p constraint in pumping lemma</li>
+                        <li>Writing equations incorrectly in Arden's method (direction of transitions)</li>
+                    </ul>
+
+                    <h3>Non-Regular Language Examples</h3>
+                    <ul>
+                        <li>{a^n b^n : n >= 0}</li>
+                        <li>{ww : w in Sigma*}</li>
+                        <li>{a^(n^2) : n >= 0}</li>
+                        <li>{a^n b^m : n != m}</li>
+                        <li>Balanced parentheses</li>
+                    </ul>
+                </section>
+
+            </article>
+        </div>
+    </main>
+
+    <footer class="page-footer">
+        <p>TAFL Study Guide - Unit II: Regular Expressions and Languages</p>
+        <p><a href="unit1.html">Previous: Unit I</a> | <a href="unit3.html">Next: Unit III</a></p>
+    </footer>
+</body>
+</html>

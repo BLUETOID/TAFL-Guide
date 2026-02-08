@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit V: Turing Machines and Recursive Function Theory - TAFL Study Guide</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="nav-header">
+        <nav class="nav-container">
+            <a href="index.html" class="nav-brand">TAFL Study Guide</a>
+            <div class="nav-links">
+                <a href="unit1.html">Unit I</a>
+                <a href="unit2.html">Unit II</a>
+                <a href="unit3.html">Unit III</a>
+                <a href="unit4.html">Unit IV</a>
+                <a href="unit5.html" class="active">Unit V</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="page-container">
+        <div class="content-wrapper">
+            <aside class="sidebar">
+                <nav class="sidebar-nav">
+                    <h3>Unit V Contents</h3>
+                    <ul>
+                        <li><a href="#tm-intro">5.1 Introduction to TM</a></li>
+                        <li><a href="#tm-formal">5.2 Formal Definition</a></li>
+                        <li><a href="#tm-computation">5.3 TM Computation</a></li>
+                        <li><a href="#tm-construction">5.4 TM Construction</a></li>
+                        <li><a href="#tm-variants">5.5 TM Variants</a></li>
+                        <li><a href="#tm-functions">5.6 TM and Integer Functions</a></li>
+                        <li><a href="#utm">5.7 Universal Turing Machine</a></li>
+                        <li><a href="#lba">5.8 Linear Bounded Automata</a></li>
+                        <li><a href="#church-turing">5.9 Church-Turing Thesis</a></li>
+                        <li><a href="#recursive">5.10 Recursive Languages</a></li>
+                        <li><a href="#halting">5.11 Halting Problem</a></li>
+                        <li><a href="#pcp">5.12 Post's Correspondence</a></li>
+                        <li><a href="#recursion-theory">5.13 Recursive Functions</a></li>
+                        <li><a href="#summary">Unit Summary</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <article class="main-content">
+                <h1>Unit V: Turing Machines and Recursive Function Theory</h1>
+
+                <!-- Section 5.1 -->
+                <section id="tm-intro">
+                    <h2>5.1 Introduction to Turing Machines</h2>
+
+                    <p>The <strong>Turing Machine (TM)</strong>, proposed by Alan Turing in 1936, is the most powerful computational model in the Chomsky hierarchy. It serves as the theoretical foundation for modern computers and defines the boundary between computable and non-computable problems.</p>
+
+                    <div class="note-box">
+                        <div class="box-title">Historical Significance</div>
+                        <p>Turing designed this model before electronic computers existed to formalize the notion of "effective computation." The TM is intentionally simple yet captures everything that any physical computer can compute.</p>
+                    </div>
+
+                    <h3>Components of a Turing Machine</h3>
+                    <ul>
+                        <li><strong>Infinite tape:</strong> Divided into cells, each holding one symbol from the tape alphabet</li>
+                        <li><strong>Read/Write head:</strong> Points to current cell, can read, write, and move left or right</li>
+                        <li><strong>Finite control:</strong> Set of states determining behavior</li>
+                        <li><strong>Transition function:</strong> Rules for state changes, writing, and movement</li>
+                    </ul>
+
+                    <div class="diagram-container">
+                        <svg width="500" height="150" viewBox="0 0 500 150">
+                            <!-- Tape -->
+                            <rect x="20" y="30" width="460" height="40" fill="none" stroke="#1a365d" stroke-width="2"/>
+
+                            <!-- Tape cells -->
+                            <line x1="66" y1="30" x2="66" y2="70" stroke="#1a365d" stroke-width="1"/>
+                            <line x1="112" y1="30" x2="112" y2="70" stroke="#1a365d" stroke-width="1"/>
+                            <line x1="158" y1="30" x2="158" y2="70" stroke="#1a365d" stroke-width="1"/>
+                            <line x1="204" y1="30" x2="204" y2="70" stroke="#1a365d" stroke-width="1"/>
+                            <line x1="250" y1="30" x2="250" y2="70" stroke="#1a365d" stroke-width="1"/>
+                            <line x1="296" y1="30" x2="296" y2="70" stroke="#1a365d" stroke-width="1"/>
+                            <line x1="342" y1="30" x2="342" y2="70" stroke="#1a365d" stroke-width="1"/>
+                            <line x1="388" y1="30" x2="388" y2="70" stroke="#1a365d" stroke-width="1"/>
+                            <line x1="434" y1="30" x2="434" y2="70" stroke="#1a365d" stroke-width="1"/>
+
+                            <!-- Cell contents -->
+                            <text x="43" y="55" text-anchor="middle" font-family="monospace" font-size="14">...</text>
+                            <text x="89" y="55" text-anchor="middle" font-family="monospace" font-size="14">B</text>
+                            <text x="135" y="55" text-anchor="middle" font-family="monospace" font-size="14">a</text>
+                            <text x="181" y="55" text-anchor="middle" font-family="monospace" font-size="14">a</text>
+                            <text x="227" y="55" text-anchor="middle" font-family="monospace" font-size="14" fill="#3182ce" font-weight="bold">b</text>
+                            <text x="273" y="55" text-anchor="middle" font-family="monospace" font-size="14">b</text>
+                            <text x="319" y="55" text-anchor="middle" font-family="monospace" font-size="14">B</text>
+                            <text x="365" y="55" text-anchor="middle" font-family="monospace" font-size="14">B</text>
+                            <text x="411" y="55" text-anchor="middle" font-family="monospace" font-size="14">B</text>
+                            <text x="457" y="55" text-anchor="middle" font-family="monospace" font-size="14">...</text>
+
+                            <!-- Tape label -->
+                            <text x="250" y="20" text-anchor="middle" font-family="Georgia" font-size="11">Infinite Tape</text>
+
+                            <!-- Read/Write Head -->
+                            <polygon points="227,75 220,90 234,90" fill="#1a365d"/>
+                            <rect x="195" y="95" width="64" height="40" fill="#f7fafc" stroke="#1a365d" stroke-width="2"/>
+                            <text x="227" y="112" text-anchor="middle" font-family="Georgia" font-size="10">Head</text>
+                            <text x="227" y="125" text-anchor="middle" font-family="monospace" font-size="10">State: q</text>
+
+                            <!-- Movement arrows -->
+                            <path d="M 170 110 L 150 110" fill="none" stroke="#1a365d" stroke-width="1.5" marker-end="url(#arrowTM1)"/>
+                            <text x="140" y="105" text-anchor="end" font-family="Georgia" font-size="9">L</text>
+                            <path d="M 284 110 L 304 110" fill="none" stroke="#1a365d" stroke-width="1.5" marker-end="url(#arrowTM1)"/>
+                            <text x="314" y="105" text-anchor="start" font-family="Georgia" font-size="9">R</text>
+
+                            <defs>
+                                <marker id="arrowTM1" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                    <polygon points="0 0, 10 3.5, 0 7" fill="#1a365d"/>
+                                </marker>
+                            </defs>
+                        </svg>
+                        <p class="diagram-caption">Figure 5.1: Turing Machine with tape, head (at 'b'), and finite control</p>
+                    </div>
+
+                    <h3>Key Differences from PDA</h3>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Property</th>
+                                <th>PDA</th>
+                                <th>Turing Machine</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Memory</td>
+                                <td>Stack (LIFO)</td>
+                                <td>Tape (random access)</td>
+                            </tr>
+                            <tr>
+                                <td>Input access</td>
+                                <td>Read-only, left-to-right</td>
+                                <td>Read/write, bidirectional</td>
+                            </tr>
+                            <tr>
+                                <td>Memory size</td>
+                                <td>Potentially infinite (stack growth)</td>
+                                <td>Infinite (tape)</td>
+                            </tr>
+                            <tr>
+                                <td>Languages</td>
+                                <td>Context-free</td>
+                                <td>Recursively enumerable</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- Section 5.2 -->
+                <section id="tm-formal">
+                    <h2>5.2 Formal Definition and Configurations</h2>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Turing Machine</div>
+                        <p>A <strong>Turing Machine (TM)</strong> is a 7-tuple M = (Q, Sigma, Gamma, delta, q0, B, F) where:</p>
+                        <ul>
+                            <li><code>Q</code> = Finite set of states</li>
+                            <li><code>Sigma</code> = Input alphabet (does not include blank B)</li>
+                            <li><code>Gamma</code> = Tape alphabet, where Sigma is a subset of Gamma and B is in Gamma</li>
+                            <li><code>delta: Q x Gamma -> Q x Gamma x {L, R}</code> = Transition function (partial)</li>
+                            <li><code>q0 in Q</code> = Initial state</li>
+                            <li><code>B in Gamma</code> = Blank symbol (fills unused tape)</li>
+                            <li><code>F subset of Q</code> = Set of final (accepting) states</li>
+                        </ul>
+                    </div>
+
+                    <h3>Transition Function</h3>
+                    <p>delta(q, X) = (p, Y, D) means:</p>
+                    <ul>
+                        <li>In state q, reading symbol X</li>
+                        <li>Write symbol Y in the current cell</li>
+                        <li>Move head in direction D (L = left, R = right)</li>
+                        <li>Enter state p</li>
+                    </ul>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Configuration (Instantaneous Description)</div>
+                        <p>A <strong>configuration</strong> of a TM is written as:</p>
+                        <p><code>alpha q beta</code></p>
+                        <p>where alpha is the tape contents to the left of the head, q is the current state, and beta is the tape contents from the head position to the right (head is on the first symbol of beta).</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: Configuration Notation</div>
+                        <p>Tape contents: ...B a a b b B B...</p>
+                        <p>Head at first 'b', state q2</p>
+                        <p>Configuration: <code>aa q2 bbB</code> or simply <code>aa q2 bb</code> (trailing blanks often omitted)</p>
+                    </div>
+
+                    <h3>Move Relation</h3>
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Move</div>
+                        <p>If delta(q, X) = (p, Y, R), then: <code>alpha q X beta |- alpha Y p beta</code></p>
+                        <p>If delta(q, X) = (p, Y, L), then: <code>alpha a q X beta |- alpha p a Y beta</code></p>
+                        <p>Use |-* for zero or more moves.</p>
+                    </div>
+                </section>
+
+                <!-- Section 5.3 -->
+                <section id="tm-computation">
+                    <h2>5.3 TM Computation and Language Acceptance</h2>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Language Accepted by TM</div>
+                        <p>The language accepted by TM M is:</p>
+                        <p><code>L(M) = {w in Sigma* : q0 w |-* alpha p beta, p in F}</code></p>
+                        <p>The TM starts with input w on the tape, head at leftmost symbol, in state q0. If it eventually enters a final state, w is accepted.</p>
+                    </div>
+
+                    <h3>TM Outcomes</h3>
+                    <p>For a given input w, a TM can:</p>
+                    <ol>
+                        <li><strong>Accept:</strong> Enter a final state (halts, w in L(M))</li>
+                        <li><strong>Reject:</strong> Halt in a non-final state (w not in L(M))</li>
+                        <li><strong>Loop forever:</strong> Never halt (w not in L(M), but we can't detect this)</li>
+                    </ol>
+
+                    <div class="note-box">
+                        <div class="box-title">Halting vs. Acceptance</div>
+                        <ul>
+                            <li><strong>Halting:</strong> TM stops (no applicable transition)</li>
+                            <li><strong>Accepting:</strong> TM halts in a final state</li>
+                        </ul>
+                        <p>A TM might accept by halting in final state, or we might define acceptance as simply halting (and rejection as looping).</p>
+                    </div>
+                </section>
+
+                <!-- Section 5.4 -->
+                <section id="tm-construction">
+                    <h2>5.4 TM Construction Techniques</h2>
+
+                    <p>Constructing TMs requires systematic thinking about state management, tape usage, and head movement.</p>
+
+                    <div class="example-box">
+                        <div class="box-title">Example 1: TM for {a^n b^n : n >= 1}</div>
+                        <p><strong>Strategy:</strong> Match a's with b's by crossing them out one at a time.</p>
+                        <ol>
+                            <li>Find leftmost uncrossed 'a', cross it out (replace with X)</li>
+                            <li>Move right to find leftmost uncrossed 'b', cross it out (replace with Y)</li>
+                            <li>Move left to find next uncrossed 'a'</li>
+                            <li>Repeat until all a's are crossed</li>
+                            <li>Verify all b's are also crossed</li>
+                        </ol>
+
+                        <p><strong>Formal TM:</strong></p>
+                        <p>M = ({q0, q1, q2, q3, q4}, {a, b}, {a, b, X, Y, B}, delta, q0, B, {q4})</p>
+
+                        <table class="transition-table">
+                            <caption>Transition Table</caption>
+                            <thead>
+                                <tr><th>State</th><th>a</th><th>b</th><th>X</th><th>Y</th><th>B</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>q0</td>
+                                    <td>(q1, X, R)</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>(q3, Y, R)</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>q1</td>
+                                    <td>(q1, a, R)</td>
+                                    <td>(q2, Y, L)</td>
+                                    <td>-</td>
+                                    <td>(q1, Y, R)</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>q2</td>
+                                    <td>(q2, a, L)</td>
+                                    <td>-</td>
+                                    <td>(q0, X, R)</td>
+                                    <td>(q2, Y, L)</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>q3</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>(q3, Y, R)</td>
+                                    <td>(q4, B, R)</td>
+                                </tr>
+                                <tr>
+                                    <td>q4</td>
+                                    <td colspan="5">(accepting state)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p><strong>State meanings:</strong></p>
+                        <ul>
+                            <li>q0: Looking for 'a' to cross out</li>
+                            <li>q1: Moving right to find matching 'b'</li>
+                            <li>q2: Found and crossed 'b', moving left to find next 'a'</li>
+                            <li>q3: All a's crossed, checking all b's are too</li>
+                            <li>q4: Accept</li>
+                        </ul>
+
+                        <p><strong>Trace for "aabb":</strong></p>
+                        <pre>
+q0 aabb      (start)
+X q1 abb     (cross first a)
+Xa q1 bb    (move right over a)
+Xa Y q2 b   (cross first b, go left)
+X q2 aYb    (moving left)
+X q0 aYb    (found X, start again)
+XX q1 Yb    (cross second a)
+XXY q1 b    (move right over Y)
+XXY Y q2    (cross second b)
+... (move left to X)
+XX q0 YY    (all a's done)
+XXY q3 Y    (check Y's)
+XXYY q3 B   (all Y's checked)
+XXYY B q4   (ACCEPT)</pre>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example 2: TM for {a^n b^n c^n : n >= 1}</div>
+                        <p><strong>Strategy:</strong> Cross out one a, one b, one c at a time.</p>
+                        <ol>
+                            <li>Find leftmost uncrossed 'a', cross it</li>
+                            <li>Find leftmost uncrossed 'b', cross it</li>
+                            <li>Find leftmost uncrossed 'c', cross it</li>
+                            <li>Return to beginning, repeat</li>
+                            <li>When no more a's, verify no more b's and c's</li>
+                        </ol>
+                        <p>This demonstrates that TMs can recognize languages beyond CFLs.</p>
+
+                        <p><strong>Formal TM:</strong></p>
+                        <p>M = (Q, {a,b,c}, {a,b,c,X,Y,Z,B}, delta, q0, B, {q6})</p>
+                        <p>States: q0 (find a), q1 (find b), q2 (find c), q3 (go back), q4 (verify), q5 (check done), q6 (accept)</p>
+
+                        <table class="transition-table">
+                            <thead>
+                                <tr><th>State</th><th>a</th><th>b</th><th>c</th><th>X</th><th>Y</th><th>Z</th><th>B</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>q0</td>
+                                    <td>(q1, X, R)</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>(q0, X, R)</td>
+                                    <td>(q4, Y, R)</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>q1</td>
+                                    <td>(q1, a, R)</td>
+                                    <td>(q2, Y, R)</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>(q1, Y, R)</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>q2</td>
+                                    <td>-</td>
+                                    <td>(q2, b, R)</td>
+                                    <td>(q3, Z, L)</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>(q2, Z, R)</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>q3</td>
+                                    <td>(q3, a, L)</td>
+                                    <td>(q3, b, L)</td>
+                                    <td>-</td>
+                                    <td>(q0, X, R)</td>
+                                    <td>(q3, Y, L)</td>
+                                    <td>(q3, Z, L)</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>q4</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>(q4, Y, R)</td>
+                                    <td>(q5, Z, R)</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>q5</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>(q5, Z, R)</td>
+                                    <td>(q6, B, R)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p><strong>Trace for "abc":</strong></p>
+                        <pre>
+q0 abc       (start, find 'a')
+X q1 bc      (crossed a, find 'b')
+XY q2 c      (crossed b, find 'c')
+X q3 YZ      (crossed c, go back)
+q0 XYZ       (back at start)
+X q4 YZ      (no more a's, verify)
+XY q4 Z      (skip Y's)
+XYZ q5 B     (found Z, check end)
+XYZB q6      (blank found, ACCEPT)</pre>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example 3: TM for {ww : w in {a,b}*}</div>
+                        <p><strong>Strategy:</strong></p>
+                        <ol>
+                            <li>Find the middle of the string (mark alternating symbols)</li>
+                            <li>Compare first half with second half symbol by symbol</li>
+                        </ol>
+                        <p>This is a more complex construction requiring multiple passes.</p>
+
+                        <p><strong>Alternative simpler approach:</strong></p>
+                        <ol>
+                            <li>Mark first symbol, scan to end counting length n</li>
+                            <li>If n is odd, reject</li>
+                            <li>Mark position n/2 (the middle)</li>
+                            <li>Compare symbol at position i with symbol at position n/2 + i</li>
+                            <li>Accept if all pairs match</li>
+                        </ol>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example 4: TM for Palindrome Checking {w : w = w^R}</div>
+                        <p><strong>Strategy:</strong> Compare first and last symbols, then shrink.</p>
+                        <ol>
+                            <li>Read and remember the first symbol (use state)</li>
+                            <li>Replace it with blank, move to rightmost non-blank</li>
+                            <li>If it matches remembered symbol, replace with blank</li>
+                            <li>Move back to leftmost non-blank, repeat</li>
+                            <li>Accept when no symbols remain or only one remains</li>
+                        </ol>
+
+                        <p><strong>States:</strong></p>
+                        <ul>
+                            <li>q0: Start, read first symbol</li>
+                            <li>qa: First symbol was 'a', moving right</li>
+                            <li>qb: First symbol was 'b', moving right</li>
+                            <li>q2: Moving left back to start</li>
+                            <li>qf: Accept</li>
+                        </ul>
+
+                        <p><strong>Key transitions:</strong></p>
+                        <ul>
+                            <li>delta(q0, a, R) = (qa, B, R) - Read 'a', remember, blank it, go right</li>
+                            <li>delta(qa, a/b, R) = (qa, a/b, R) - Skip to end</li>
+                            <li>delta(qa, B, L) = (q_check_a, B, L) - At end, prepare to check</li>
+                            <li>delta(q_check_a, a, L) = (q2, B, L) - Match! Blank and go left</li>
+                            <li>delta(q_check_a, b, -) = reject - Mismatch</li>
+                            <li>delta(q2, a/b, L) = (q2, a/b, L) - Go back to start</li>
+                            <li>delta(q2, B, R) = (q0, B, R) - Back at start, repeat</li>
+                            <li>delta(q0, B, -) = (qf, B, -) - Empty, accept</li>
+                        </ul>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example 5: TM for Addition (Unary)</div>
+                        <p><strong>Problem:</strong> Compute f(m, n) = m + n where input is 0^m # 0^n</p>
+                        <p><strong>Output:</strong> 0^(m+n)</p>
+
+                        <p><strong>Strategy:</strong></p>
+                        <ol>
+                            <li>Replace # with 0</li>
+                            <li>Erase one 0 from the end (to account for the # we converted)</li>
+                        </ol>
+
+                        <p><strong>Example:</strong> 000#00 (3+2)</p>
+                        <pre>
+000#00     -- Input
+00000      -- Replace # with 0
+0000B      -- Erase rightmost 0
+Result: 00000 (but one less = 0000? No wait...)
+        </pre>
+                        <p><strong>Correction:</strong> Actually for proper addition:</p>
+                        <pre>
+Input:  0^m # 0^n
+Step 1: Replace # with 0  -> 0^m 0 0^n = 0^(m+n+1)
+Step 2: Erase one 0      -> 0^(m+n)
+        </pre>
+                    </div>
+
+                    <div class="exam-tip-box">
+                        <div class="box-title">TM Construction Tips</div>
+                        <ul>
+                            <li>Clearly define what each state represents</li>
+                            <li>Use different tape symbols to mark progress</li>
+                            <li>Think about head movement patterns carefully</li>
+                            <li>Handle edge cases (empty input, single character, etc.)</li>
+                            <li>Use a multi-pass approach for complex problems</li>
+                            <li>Consider using "remember in state" technique for comparing symbols</li>
+                            <li>Always verify with a trace through a simple example</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Section 5.5 -->
+                <section id="tm-variants">
+                    <h2>5.5 Variants and Modifications of TM</h2>
+
+                    <p>Many TM variants have been proposed, but they all have the same computational power as the basic model.</p>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Variant</th>
+                                <th>Description</th>
+                                <th>Equivalent to Basic TM?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Multi-tape TM</td>
+                                <td>Multiple tapes with independent heads</td>
+                                <td>Yes (can simulate with tracks)</td>
+                            </tr>
+                            <tr>
+                                <td>Multi-head TM</td>
+                                <td>Multiple heads on one tape</td>
+                                <td>Yes</td>
+                            </tr>
+                            <tr>
+                                <td>Two-way infinite tape</td>
+                                <td>Tape extends infinitely in both directions</td>
+                                <td>Yes</td>
+                            </tr>
+                            <tr>
+                                <td>Multi-dimensional tape</td>
+                                <td>2D or higher dimensional tape</td>
+                                <td>Yes</td>
+                            </tr>
+                            <tr>
+                                <td>Non-deterministic TM</td>
+                                <td>Multiple transitions possible</td>
+                                <td>Yes (for language acceptance)</td>
+                            </tr>
+                            <tr>
+                                <td>Stay option (L, R, S)</td>
+                                <td>Head can stay in place</td>
+                                <td>Yes</td>
+                            </tr>
+                            <tr>
+                                <td>Semi-infinite tape</td>
+                                <td>Tape infinite only to the right</td>
+                                <td>Yes</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="theorem-box">
+                        <div class="box-title">Theorem: TM Variant Equivalence</div>
+                        <p>All reasonable variants of Turing Machines are equivalent in computational power. They recognize the same class of languages (recursively enumerable) and compute the same functions.</p>
+                    </div>
+
+                    <h3>Multi-tape TM</h3>
+                    <div class="definition-box">
+                        <div class="box-title">Definition: k-tape TM</div>
+                        <p>A k-tape TM has k separate tapes, each with its own head. The transition function is:</p>
+                        <p><code>delta: Q x Gamma^k -> Q x Gamma^k x {L, R}^k</code></p>
+                        <p>Each tape can be read/written independently, and heads move independently.</p>
+                    </div>
+
+                    <div class="theorem-box">
+                        <div class="box-title">Theorem: Multi-tape to Single-tape</div>
+                        <p>Every k-tape TM can be simulated by a single-tape TM. If the k-tape TM runs in time T(n), the single-tape simulation runs in time O(T(n)^2).</p>
+                    </div>
+
+                    <h3>Non-deterministic TM</h3>
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Non-deterministic TM</div>
+                        <p>A non-deterministic TM allows multiple transitions from each configuration:</p>
+                        <p><code>delta: Q x Gamma -> P(Q x Gamma x {L, R})</code></p>
+                        <p>The NTM accepts if ANY computation branch accepts.</p>
+                    </div>
+
+                    <div class="note-box">
+                        <div class="box-title">NTM vs Deterministic TM</div>
+                        <ul>
+                            <li><strong>Language recognition:</strong> NTM = Deterministic TM (same power)</li>
+                            <li><strong>Time complexity:</strong> May differ exponentially (P vs NP question)</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Section 5.6 -->
+                <section id="tm-functions">
+                    <h2>5.6 TM as a Computer of Integer Functions</h2>
+
+                    <p>TMs can compute functions, not just recognize languages. For integer functions, we use unary representation.</p>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: TM Computing a Function</div>
+                        <p>A TM M computes function f: N^k -> N if:</p>
+                        <ul>
+                            <li>Input: <code>0^n1 # 0^n2 # ... # 0^nk</code> (k arguments in unary)</li>
+                            <li>Output: On halting, tape contains <code>0^f(n1,n2,...,nk)</code></li>
+                        </ul>
+                        <p>A function is <strong>Turing computable</strong> if some TM computes it.</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: TM for Addition</div>
+                        <p>Compute f(m, n) = m + n</p>
+                        <p>Input: 0^m # 0^n (e.g., "000#00" for 3+2)</p>
+                        <p>Output: 0^(m+n) (e.g., "00000" for 5)</p>
+                        <p><strong>Strategy:</strong> Replace # with 0, erase one 0 from the end.</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: TM for Multiplication</div>
+                        <p>Compute f(m, n) = m * n</p>
+                        <p><strong>Strategy:</strong> For each 0 in the first group, copy the entire second group.</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: TM for Proper Subtraction</div>
+                        <p>Compute f(m, n) = m - n if m >= n, else 0</p>
+                        <p><strong>Strategy:</strong> Match and cross out 0s from both groups until one is exhausted.</p>
+                    </div>
+                </section>
+
+                <!-- Section 5.7 -->
+                <section id="utm">
+                    <h2>5.7 Universal Turing Machine</h2>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Universal Turing Machine</div>
+                        <p>A <strong>Universal Turing Machine (UTM)</strong> U is a TM that can simulate any other TM M on any input w. Given an encoding of M (denoted [M]) and input w, U simulates M's computation on w.</p>
+                        <p><code>U([M], w) = M(w)</code></p>
+                    </div>
+
+                    <h3>How UTM Works</h3>
+                    <ol>
+                        <li><strong>Encoding:</strong> Represent states, alphabet, and transitions as strings</li>
+                        <li><strong>Simulation:</strong> UTM uses multiple tapes (or tracks):
+                            <ul>
+                                <li>Tape 1: Encoded description of M</li>
+                                <li>Tape 2: Simulated tape of M</li>
+                                <li>Tape 3: Current state of M</li>
+                            </ul>
+                        </li>
+                        <li><strong>Execution:</strong> For each step, UTM looks up M's transition, updates simulated tape and state</li>
+                    </ol>
+
+                    <div class="theorem-box">
+                        <div class="box-title">Theorem: Existence of UTM</div>
+                        <p>There exists a Universal Turing Machine U such that for any TM M and input w:</p>
+                        <ul>
+                            <li>If M accepts w, then U accepts ([M], w)</li>
+                            <li>If M rejects w, then U rejects ([M], w)</li>
+                            <li>If M loops on w, then U loops on ([M], w)</li>
+                        </ul>
+                    </div>
+
+                    <div class="note-box">
+                        <div class="box-title">Significance of UTM</div>
+                        <ul>
+                            <li>UTM is the theoretical foundation of stored-program computers</li>
+                            <li>Programs and data are both represented as strings</li>
+                            <li>A single machine can execute any algorithm</li>
+                            <li>UTM enables self-reference, leading to undecidability results</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Section 5.8 -->
+                <section id="lba">
+                    <h2>5.8 Linear Bounded Automata (LBA)</h2>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Linear Bounded Automaton</div>
+                        <p>A <strong>Linear Bounded Automaton (LBA)</strong> is a non-deterministic Turing Machine with the restriction that the tape head cannot move beyond the portion of the tape containing the input.</p>
+                        <ul>
+                            <li>Tape is bounded by special end markers (e.g., $ and #)</li>
+                            <li>Head cannot move past these markers</li>
+                            <li>Tape space is O(n) where n is input length</li>
+                        </ul>
+                    </div>
+
+                    <div class="theorem-box">
+                        <div class="box-title">Theorem: LBA and Context-Sensitive Languages</div>
+                        <p>A language is context-sensitive if and only if it is accepted by some LBA.</p>
+                    </div>
+
+                    <h3>LBA in the Chomsky Hierarchy</h3>
+                    <p>LBA sits between PDA and TM:</p>
+                    <ul>
+                        <li>PDA (stack) < LBA (bounded tape) < TM (unbounded tape)</li>
+                        <li>CFL < CSL < RE</li>
+                    </ul>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: LBA for {a^n b^n c^n : n >= 1}</div>
+                        <p>An LBA can recognize this non-CFL because it can use bounded space to count and match all three groups.</p>
+                        <p>Strategy: Cross out one a, one b, one c repeatedly using only the input space.</p>
+                    </div>
+
+                    <div class="note-box">
+                        <div class="box-title">Open Problem</div>
+                        <p>Whether NLBA (non-deterministic LBA) equals DLBA (deterministic LBA) in power is a famous open problem in complexity theory, known as the LBA problem.</p>
+                    </div>
+                </section>
+
+                <!-- Section 5.9 -->
+                <section id="church-turing">
+                    <h2>5.9 Church-Turing Thesis</h2>
+
+                    <div class="theorem-box">
+                        <div class="box-title">Church-Turing Thesis</div>
+                        <p>Any function that can be computed by an "effective procedure" (algorithm) can be computed by a Turing Machine.</p>
+                        <p>Equivalently: The informal notion of "algorithm" is captured exactly by the formal notion of "Turing Machine."</p>
+                    </div>
+
+                    <div class="note-box">
+                        <div class="box-title">Important Clarifications</div>
+                        <ul>
+                            <li>This is a <strong>thesis</strong>, not a theorem - it cannot be formally proved</li>
+                            <li>It equates an informal concept (algorithm) with a formal one (TM)</li>
+                            <li>Supported by the equivalence of many independent formalizations:
+                                <ul>
+                                    <li>Turing Machines</li>
+                                    <li>Lambda Calculus (Church)</li>
+                                    <li>Recursive Functions (Godel, Kleene)</li>
+                                    <li>Post Systems</li>
+                                    <li>Markov Algorithms</li>
+                                </ul>
+                            </li>
+                            <li>No computational model has been found that computes more than TMs</li>
+                        </ul>
+                    </div>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Effective Computability</div>
+                        <p>A function f is <strong>effectively computable</strong> if there exists a mechanical procedure (algorithm) that, given any input x in the domain, produces f(x) after a finite number of steps.</p>
+                    </div>
+
+                    <h3>Implications</h3>
+                    <ul>
+                        <li>Turing Machines define the limits of computation</li>
+                        <li>Problems unsolvable by TM are unsolvable by ANY algorithm</li>
+                        <li>All modern programming languages are Turing-complete</li>
+                        <li>Quantum computers are NOT more powerful than TMs (for computability)</li>
+                    </ul>
+                </section>
+
+                <!-- Section 5.10 -->
+                <section id="recursive">
+                    <h2>5.10 Recursive and Recursively Enumerable Languages</h2>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Recursively Enumerable (RE) Language</div>
+                        <p>A language L is <strong>recursively enumerable (RE)</strong> if there exists a TM M such that:</p>
+                        <ul>
+                            <li>If w in L, then M accepts w (halts in accepting state)</li>
+                            <li>If w not in L, then M either rejects w or loops forever</li>
+                        </ul>
+                        <p>L is RE iff L = L(M) for some TM M.</p>
+                    </div>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Recursive (Decidable) Language</div>
+                        <p>A language L is <strong>recursive</strong> (or <strong>decidable</strong>) if there exists a TM M such that:</p>
+                        <ul>
+                            <li>If w in L, then M accepts w</li>
+                            <li>If w not in L, then M rejects w (halts in non-accepting state)</li>
+                        </ul>
+                        <p>M always halts on every input.</p>
+                    </div>
+
+                    <h3>Relationship</h3>
+                    <div class="diagram-container">
+                        <svg width="350" height="180" viewBox="0 0 350 180">
+                            <!-- All languages -->
+                            <ellipse cx="175" cy="90" rx="165" ry="80" fill="none" stroke="#1a365d" stroke-width="2"/>
+                            <text x="320" y="30" font-family="Georgia" font-size="10">All Languages</text>
+
+                            <!-- RE -->
+                            <ellipse cx="175" cy="100" rx="130" ry="55" fill="none" stroke="#3182ce" stroke-width="2"/>
+                            <text x="280" y="80" font-family="Georgia" font-size="10">RE</text>
+
+                            <!-- Recursive -->
+                            <ellipse cx="175" cy="105" rx="90" ry="35" fill="none" stroke="#38a169" stroke-width="2"/>
+                            <text x="175" y="105" text-anchor="middle" font-family="Georgia" font-size="10">Recursive</text>
+                            <text x="175" y="118" text-anchor="middle" font-family="Georgia" font-size="9">(Decidable)</text>
+                        </svg>
+                        <p class="diagram-caption">Figure 5.2: Recursive languages are a proper subset of RE languages</p>
+                    </div>
+
+                    <div class="theorem-box">
+                        <div class="box-title">Theorem: Recursive and Complement</div>
+                        <p>A language L is recursive if and only if both L and its complement L' are recursively enumerable.</p>
+                    </div>
+
+                    <div class="note-box">
+                        <div class="box-title">Proof Idea</div>
+                        <ul>
+                            <li>If L is recursive, we can decide L', so L' is also recursive (and hence RE)</li>
+                            <li>If L and L' are both RE, run TMs for both in parallel. One must halt on any input.</li>
+                        </ul>
+                    </div>
+
+                    <h3>Classification of Languages</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>L</th>
+                                <th>L'</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Recursive</td>
+                                <td>RE</td>
+                                <td>RE</td>
+                                <td>All regular, CFL, {a^n b^n c^n}</td>
+                            </tr>
+                            <tr>
+                                <td>RE but not Recursive</td>
+                                <td>RE</td>
+                                <td>Not RE</td>
+                                <td>Halting problem language</td>
+                            </tr>
+                            <tr>
+                                <td>Not RE</td>
+                                <td>Not RE</td>
+                                <td>RE or Not RE</td>
+                                <td>Complement of halting problem</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- Section 5.11 -->
+                <section id="halting">
+                    <h2>5.11 The Halting Problem</h2>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Halting Problem</div>
+                        <p>The <strong>Halting Problem</strong> is: Given a TM M and input w, determine whether M halts on input w.</p>
+                        <p>Formally, define the language:</p>
+                        <p><code>HALT = {([M], w) : M halts on input w}</code></p>
+                    </div>
+
+                    <div class="theorem-box">
+                        <div class="box-title">Theorem: Undecidability of Halting Problem</div>
+                        <p>The halting problem is <strong>undecidable</strong>. There is no TM that can decide HALT.</p>
+                        <p>However, HALT is recursively enumerable (we can recognize when M halts, but not when it doesn't).</p>
+                    </div>
+
+                    <h3>Proof by Diagonalization</h3>
+                    <div class="algorithm">
+                        <div class="algorithm-title">Proof: Halting Problem is Undecidable</div>
+                        <p><strong>Assume</strong> for contradiction that there exists a TM H that decides HALT:</p>
+                        <ul>
+                            <li>H([M], w) = "yes" if M halts on w</li>
+                            <li>H([M], w) = "no" if M doesn't halt on w</li>
+                        </ul>
+
+                        <p><strong>Construct</strong> a new TM D that takes input [M]:</p>
+                        <ol>
+                            <li>Run H([M], [M]) - ask if M halts on its own description</li>
+                            <li>If H says "yes" (M halts on [M]), then D loops forever</li>
+                            <li>If H says "no" (M doesn't halt on [M]), then D halts</li>
+                        </ol>
+
+                        <p><strong>Consider:</strong> What does D do on input [D]?</p>
+                        <ul>
+                            <li>If D halts on [D]: H([D], [D]) = "yes", so D should loop. Contradiction!</li>
+                            <li>If D loops on [D]: H([D], [D]) = "no", so D should halt. Contradiction!</li>
+                        </ul>
+
+                        <p><strong>Conclusion:</strong> H cannot exist. The halting problem is undecidable.</p>
+                    </div>
+
+                    <div class="note-box">
+                        <div class="box-title">Significance</div>
+                        <ul>
+                            <li>This was the first problem proved undecidable (Turing, 1936)</li>
+                            <li>Many other problems are shown undecidable by reduction to halting</li>
+                            <li>Shows fundamental limits of computation</li>
+                            <li>Related to Godel's incompleteness theorems</li>
+                        </ul>
+                    </div>
+
+                    <h3>Other Undecidable Problems</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Problem</th>
+                                <th>Question</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>State-entry problem</td>
+                                <td>Does TM M ever enter state q on input w?</td>
+                            </tr>
+                            <tr>
+                                <td>Blank-tape halting</td>
+                                <td>Does TM M halt on blank tape?</td>
+                            </tr>
+                            <tr>
+                                <td>Emptiness</td>
+                                <td>Is L(M) = empty set?</td>
+                            </tr>
+                            <tr>
+                                <td>Equivalence</td>
+                                <td>Is L(M1) = L(M2)?</td>
+                            </tr>
+                            <tr>
+                                <td>Regularity</td>
+                                <td>Is L(M) regular?</td>
+                            </tr>
+                            <tr>
+                                <td>CFG ambiguity</td>
+                                <td>Is grammar G ambiguous?</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Reduction Technique</h3>
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Reduction</div>
+                        <p>A <strong>reduction</strong> from problem A to problem B is a computable function f such that:</p>
+                        <p><code>x in A iff f(x) in B</code></p>
+                        <p>If A reduces to B and B is decidable, then A is decidable.</p>
+                        <p>Contrapositive: If A is undecidable and A reduces to B, then B is undecidable.</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: Proving Emptiness is Undecidable</div>
+                        <p><strong>Claim:</strong> The problem "Is L(M) = empty?" is undecidable.</p>
+                        <p><strong>Proof by reduction from Halting Problem:</strong></p>
+                        <ol>
+                            <li>Assume we have a decider E that decides emptiness.</li>
+                            <li>We'll use E to solve the halting problem.</li>
+                            <li>Given TM M and input w, construct TM M' that:
+                                <ul>
+                                    <li>On any input x, M' simulates M on w</li>
+                                    <li>If M halts on w, M' accepts x</li>
+                                    <li>If M loops on w, M' loops on x</li>
+                                </ul>
+                            </li>
+                            <li>Now: L(M') = Sigma* if M halts on w, L(M') = empty if M doesn't halt on w.</li>
+                            <li>So E(M') tells us whether M halts on w!</li>
+                            <li>But halting is undecidable, so E cannot exist.</li>
+                        </ol>
+                    </div>
+
+                    <div class="exam-tip-box">
+                        <div class="box-title">Reduction Proof Template</div>
+                        <ol>
+                            <li>Assume the target problem is decidable (there exists a decider D).</li>
+                            <li>Show how to use D to solve the halting problem (or another known undecidable problem).</li>
+                            <li>This typically involves constructing a new TM that "encodes" the halting question.</li>
+                            <li>Conclude: Since halting is undecidable, D cannot exist.</li>
+                        </ol>
+                    </div>
+                </section>
+
+                <!-- Section 5.12 -->
+                <section id="pcp">
+                    <h2>5.12 Post's Correspondence Problem (PCP)</h2>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Post's Correspondence Problem</div>
+                        <p>Given two lists of strings over alphabet Sigma:</p>
+                        <ul>
+                            <li>A = (w1, w2, ..., wn)</li>
+                            <li>B = (x1, x2, ..., xn)</li>
+                        </ul>
+                        <p>The <strong>PCP</strong> asks: Is there a sequence of indices i1, i2, ..., ik (k >= 1) such that:</p>
+                        <p><code>w_{i1} w_{i2} ... w_{ik} = x_{i1} x_{i2} ... x_{ik}</code></p>
+                        <p>Such a sequence is called a <strong>match</strong> or <strong>solution</strong>.</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: PCP Instance with Solution</div>
+                        <p>A = (a, ab, bba)</p>
+                        <p>B = (baa, aa, bb)</p>
+
+                        <p><strong>Try sequence 3, 2, 3, 1:</strong></p>
+                        <ul>
+                            <li>A: w3 w2 w3 w1 = bba + ab + bba + a = bbaabbba + a = <strong>bbaabbaa</strong></li>
+                            <li>B: x3 x2 x3 x1 = bb + aa + bb + baa = <strong>bbaabbaa</strong></li>
+                        </ul>
+                        <p>Match! Solution exists: (3, 2, 3, 1)</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: PCP Instance without Solution</div>
+                        <p>A = (ab, b)</p>
+                        <p>B = (a, bb)</p>
+
+                        <p>Analysis:</p>
+                        <ul>
+                            <li>w1 = ab starts with a, x1 = a starts with a (OK)</li>
+                            <li>But w1 = ab, x1 = a have different lengths after first symbol</li>
+                            <li>If start with index 1: ab vs a - A is longer</li>
+                            <li>Next must make B catch up, but x2 = bb, w2 = b - B grows faster</li>
+                        </ul>
+                        <p>Can prove no sequence works.</p>
+                    </div>
+
+                    <div class="theorem-box">
+                        <div class="box-title">Theorem: PCP is Undecidable</div>
+                        <p>The Post Correspondence Problem is undecidable. There is no algorithm that, given any PCP instance, can determine whether a solution exists.</p>
+                    </div>
+
+                    <div class="note-box">
+                        <div class="box-title">Applications of PCP</div>
+                        <p>PCP is often used to prove undecidability of other problems through reduction:</p>
+                        <ul>
+                            <li>CFG ambiguity</li>
+                            <li>CFG equivalence</li>
+                            <li>Whether intersection of two CFLs is empty</li>
+                        </ul>
+                    </div>
+
+                    <h3>Modified PCP (MPCP)</h3>
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Modified PCP</div>
+                        <p>Same as PCP, but the solution must start with index 1:</p>
+                        <p>Find i1, i2, ..., ik where i1 = 1 and <code>w_1 w_{i2} ... w_{ik} = x_1 x_{i2} ... x_{ik}</code></p>
+                    </div>
+
+                    <p>MPCP is also undecidable, and it's often easier to reduce from halting problem to MPCP first, then MPCP to PCP.</p>
+                </section>
+
+                <!-- Section 5.13 -->
+                <section id="recursion-theory">
+                    <h2>5.13 Introduction to Recursive Function Theory</h2>
+
+                    <p>Recursive Function Theory provides an alternative mathematical characterization of computability, equivalent to Turing Machines.</p>
+
+                    <h3>Primitive Recursive Functions</h3>
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Primitive Recursive Functions</div>
+                        <p>The class of <strong>primitive recursive functions</strong> is the smallest class containing:</p>
+                        <ol>
+                            <li><strong>Zero function:</strong> Z(x) = 0</li>
+                            <li><strong>Successor function:</strong> S(x) = x + 1</li>
+                            <li><strong>Projection functions:</strong> P_i^n(x1, ..., xn) = xi</li>
+                        </ol>
+                        <p>And closed under:</p>
+                        <ol start="4">
+                            <li><strong>Composition:</strong> If g, h1, ..., hm are PR, then f(x) = g(h1(x), ..., hm(x)) is PR</li>
+                            <li><strong>Primitive recursion:</strong> If g and h are PR, then f defined by:
+                                <ul>
+                                    <li>f(x, 0) = g(x)</li>
+                                    <li>f(x, y+1) = h(x, y, f(x, y))</li>
+                                </ul>
+                                is PR</li>
+                        </ol>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Examples of Primitive Recursive Functions</div>
+                        <p><strong>Addition:</strong></p>
+                        <ul>
+                            <li>add(x, 0) = x = P_1^1(x)</li>
+                            <li>add(x, y+1) = S(add(x, y))</li>
+                        </ul>
+
+                        <p><strong>Multiplication:</strong></p>
+                        <ul>
+                            <li>mult(x, 0) = 0 = Z(x)</li>
+                            <li>mult(x, y+1) = add(x, mult(x, y))</li>
+                        </ul>
+
+                        <p><strong>Factorial:</strong></p>
+                        <ul>
+                            <li>fact(0) = 1</li>
+                            <li>fact(y+1) = mult(S(y), fact(y))</li>
+                        </ul>
+                    </div>
+
+                    <h3>General Recursive Functions</h3>
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Mu-Recursion (Minimization)</div>
+                        <p>The <strong>unbounded minimization</strong> operator mu is defined as:</p>
+                        <p><code>f(x) = mu y [g(x, y) = 0]</code></p>
+                        <p>This returns the smallest y such that g(x, y) = 0, if such y exists.</p>
+                    </div>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: General Recursive Functions</div>
+                        <p><strong>General recursive functions</strong> (also called partial recursive or mu-recursive functions) extend primitive recursive functions with the mu operator.</p>
+                        <p>General recursive functions = Turing computable functions</p>
+                    </div>
+
+                    <div class="theorem-box">
+                        <div class="box-title">Theorem: Equivalence of Formalisms</div>
+                        <p>The following classes of functions are identical:</p>
+                        <ul>
+                            <li>Turing computable functions</li>
+                            <li>General recursive (mu-recursive) functions</li>
+                            <li>Lambda-definable functions</li>
+                        </ul>
+                        <p>This supports the Church-Turing thesis.</p>
+                    </div>
+
+                    <h3>Properties of Function Classes</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Class</th>
+                                <th>Total?</th>
+                                <th>Computability</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Primitive Recursive</td>
+                                <td>Always total</td>
+                                <td>Subset of Turing computable</td>
+                            </tr>
+                            <tr>
+                                <td>General Recursive</td>
+                                <td>May be partial</td>
+                                <td>Exactly Turing computable</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="note-box">
+                        <div class="box-title">Ackermann Function</div>
+                        <p>The Ackermann function is a famous example of a function that is:</p>
+                        <ul>
+                            <li>Turing computable (general recursive)</li>
+                            <li>NOT primitive recursive</li>
+                            <li>Total (always terminates)</li>
+                        </ul>
+                        <p>This shows that primitive recursion is strictly weaker than general recursion, even for total functions.</p>
+                    </div>
+                </section>
+
+                <!-- Unit Summary -->
+                <section id="summary" class="unit-summary">
+                    <h2>Unit V Summary</h2>
+
+                    <h3>Key Results</h3>
+                    <ul class="key-results">
+                        <li>Turing Machine is the most powerful computational model</li>
+                        <li>All TM variants (multi-tape, non-deterministic, etc.) are equivalent in power</li>
+                        <li>Universal TM can simulate any TM - foundation of stored-program computers</li>
+                        <li>Church-Turing Thesis: TM captures all "effective computation"</li>
+                        <li>Halting Problem is undecidable - fundamental limit of computation</li>
+                        <li>L is recursive iff both L and L' are RE</li>
+                    </ul>
+
+                    <h3>Language Hierarchy (Complete)</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Language</th>
+                                <th>Automaton</th>
+                                <th>Grammar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Type 3</td>
+                                <td>Regular</td>
+                                <td>DFA/NFA</td>
+                                <td>Regular Grammar</td>
+                            </tr>
+                            <tr>
+                                <td>Type 2</td>
+                                <td>Context-Free</td>
+                                <td>PDA</td>
+                                <td>CFG</td>
+                            </tr>
+                            <tr>
+                                <td>Type 1</td>
+                                <td>Context-Sensitive</td>
+                                <td>LBA</td>
+                                <td>CSG</td>
+                            </tr>
+                            <tr>
+                                <td>Type 0</td>
+                                <td>Recursively Enumerable</td>
+                                <td>TM</td>
+                                <td>Unrestricted</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Decidability Summary</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Problem</th>
+                                <th>Regular</th>
+                                <th>CFL</th>
+                                <th>RE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Membership</td>
+                                <td>Decidable</td>
+                                <td>Decidable</td>
+                                <td>Semi-decidable</td>
+                            </tr>
+                            <tr>
+                                <td>Emptiness</td>
+                                <td>Decidable</td>
+                                <td>Decidable</td>
+                                <td>Undecidable</td>
+                            </tr>
+                            <tr>
+                                <td>Equivalence</td>
+                                <td>Decidable</td>
+                                <td>Undecidable</td>
+                                <td>Undecidable</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Algorithms and Proofs to Know</h3>
+                    <ul>
+                        <li>TM construction for basic languages</li>
+                        <li>Diagonalization proof for halting problem</li>
+                        <li>Reduction technique for proving undecidability</li>
+                        <li>PCP problem structure</li>
+                    </ul>
+
+                    <h3>Common Mistakes to Avoid</h3>
+                    <ul class="common-mistakes">
+                        <li>Confusing "undecidable" with "impossible" (undecidable means no algorithm, not unsolvable for specific cases)</li>
+                        <li>Thinking NTM is more powerful than deterministic TM (same power for language recognition)</li>
+                        <li>Confusing RE (semi-decidable) with recursive (decidable)</li>
+                        <li>Forgetting that Church-Turing thesis is NOT a theorem</li>
+                        <li>Assuming all TM problems are undecidable (membership for specific TMs is decidable)</li>
+                    </ul>
+                </section>
+
+            </article>
+        </div>
+    </main>
+
+    <footer class="page-footer">
+        <p>TAFL Study Guide - Unit V: Turing Machines and Recursive Function Theory</p>
+        <p><a href="unit4.html">Previous: Unit IV</a> | <a href="index.html">Back to Home</a></p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit IV: Pushdown Automata and CFL Properties - TAFL Study Guide</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="nav-header">
+        <nav class="nav-container">
+            <a href="index.html" class="nav-brand">TAFL Study Guide</a>
+            <div class="nav-links">
+                <a href="unit1.html">Unit I</a>
+                <a href="unit2.html">Unit II</a>
+                <a href="unit3.html">Unit III</a>
+                <a href="unit4.html" class="active">Unit IV</a>
+                <a href="unit5.html">Unit V</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="page-container">
+        <div class="content-wrapper">
+            <aside class="sidebar">
+                <nav class="sidebar-nav">
+                    <h3>Unit IV Contents</h3>
+                    <ul>
+                        <li><a href="#pda-intro">4.1 Introduction to PDA</a></li>
+                        <li><a href="#pda-formal">4.2 Formal Definition</a></li>
+                        <li><a href="#pda-moves">4.3 Moves and Configurations</a></li>
+                        <li><a href="#acceptance">4.4 Acceptance Methods</a></li>
+                        <li><a href="#npda-dpda">4.5 NPDA vs DPDA</a></li>
+                        <li><a href="#dcfl">4.6 Deterministic CFL</a></li>
+                        <li><a href="#pda-cfg">4.7 PDA and CFG Equivalence</a></li>
+                        <li><a href="#cfg-to-pda">4.8 CFG to PDA Construction</a></li>
+                        <li><a href="#two-stack">4.9 Two-Stack PDA</a></li>
+                        <li><a href="#pumping-cfl">4.10 Pumping Lemma for CFL</a></li>
+                        <li><a href="#closure-cfl">4.11 Closure Properties</a></li>
+                        <li><a href="#decision-cfl">4.12 Decision Problems</a></li>
+                        <li><a href="#summary">Unit Summary</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <article class="main-content">
+                <h1>Unit IV: Pushdown Automata and CFL Properties</h1>
+
+                <!-- Section 4.1 -->
+                <section id="pda-intro">
+                    <h2>4.1 Introduction to Pushdown Automata</h2>
+
+                    <p>A <strong>Pushdown Automaton (PDA)</strong> is a finite automaton equipped with an auxiliary stack memory. This stack allows the PDA to recognize context-free languages, which require more memory than finite automata can provide.</p>
+
+                    <div class="note-box">
+                        <div class="box-title">Why Do We Need PDA?</div>
+                        <p>DFAs have finite memory (fixed number of states). They cannot:</p>
+                        <ul>
+                            <li>Count unboundedly (e.g., match n a's with n b's)</li>
+                            <li>Remember arbitrary-length prefixes</li>
+                            <li>Handle nested structures (e.g., balanced parentheses)</li>
+                        </ul>
+                        <p>The stack provides potentially infinite memory with Last-In-First-Out (LIFO) access.</p>
+                    </div>
+
+                    <h3>Components of a PDA</h3>
+                    <ul>
+                        <li><strong>Input tape:</strong> Contains the input string, read left to right</li>
+                        <li><strong>Finite control:</strong> Set of states with transitions</li>
+                        <li><strong>Stack:</strong> Auxiliary memory with push and pop operations</li>
+                    </ul>
+
+                    <div class="diagram-container">
+                        <svg width="450" height="200" viewBox="0 0 450 200">
+                            <!-- Input tape -->
+                            <rect x="100" y="20" width="250" height="35" fill="none" stroke="#1a365d" stroke-width="2"/>
+                            <line x1="150" y1="20" x2="150" y2="55" stroke="#1a365d" stroke-width="1"/>
+                            <line x1="200" y1="20" x2="200" y2="55" stroke="#1a365d" stroke-width="1"/>
+                            <line x1="250" y1="20" x2="250" y2="55" stroke="#1a365d" stroke-width="1"/>
+                            <line x1="300" y1="20" x2="300" y2="55" stroke="#1a365d" stroke-width="1"/>
+                            <text x="125" y="42" text-anchor="middle" font-family="monospace" font-size="14">a</text>
+                            <text x="175" y="42" text-anchor="middle" font-family="monospace" font-size="14">a</text>
+                            <text x="225" y="42" text-anchor="middle" font-family="monospace" font-size="14">b</text>
+                            <text x="275" y="42" text-anchor="middle" font-family="monospace" font-size="14">b</text>
+                            <text x="325" y="42" text-anchor="middle" font-family="monospace" font-size="14">...</text>
+                            <text x="225" y="12" text-anchor="middle" font-family="Georgia" font-size="11">Input Tape</text>
+
+                            <!-- Read head -->
+                            <polygon points="175,60 170,75 180,75" fill="#1a365d"/>
+                            <text x="175" y="88" text-anchor="middle" font-family="Georgia" font-size="10">Head</text>
+
+                            <!-- Finite Control -->
+                            <rect x="130" y="100" width="90" height="50" fill="#f7fafc" stroke="#1a365d" stroke-width="2"/>
+                            <text x="175" y="120" text-anchor="middle" font-family="Georgia" font-size="11">Finite</text>
+                            <text x="175" y="135" text-anchor="middle" font-family="Georgia" font-size="11">Control</text>
+
+                            <!-- Stack -->
+                            <rect x="300" y="80" width="50" height="100" fill="none" stroke="#1a365d" stroke-width="2"/>
+                            <line x1="300" y1="100" x2="350" y2="100" stroke="#1a365d" stroke-width="1"/>
+                            <line x1="300" y1="120" x2="350" y2="120" stroke="#1a365d" stroke-width="1"/>
+                            <line x1="300" y1="140" x2="350" y2="140" stroke="#1a365d" stroke-width="1"/>
+                            <line x1="300" y1="160" x2="350" y2="160" stroke="#1a365d" stroke-width="1"/>
+                            <text x="325" y="95" text-anchor="middle" font-family="monospace" font-size="11">A</text>
+                            <text x="325" y="115" text-anchor="middle" font-family="monospace" font-size="11">A</text>
+                            <text x="325" y="135" text-anchor="middle" font-family="monospace" font-size="11">Z0</text>
+                            <text x="325" y="70" text-anchor="middle" font-family="Georgia" font-size="11">Stack</text>
+                            <text x="370" y="90" text-anchor="start" font-family="Georgia" font-size="9">Top</text>
+                            <polygon points="355,88 365,85 365,91" fill="#1a365d"/>
+
+                            <!-- Connection arrow -->
+                            <line x1="220" y1="125" x2="295" y2="110" stroke="#1a365d" stroke-width="1.5" marker-end="url(#arrowPDA1)"/>
+
+                            <defs>
+                                <marker id="arrowPDA1" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                    <polygon points="0 0, 10 3.5, 0 7" fill="#1a365d"/>
+                                </marker>
+                            </defs>
+                        </svg>
+                        <p class="diagram-caption">Figure 4.1: Schematic diagram of a Pushdown Automaton</p>
+                    </div>
+                </section>
+
+                <!-- Section 4.2 -->
+                <section id="pda-formal">
+                    <h2>4.2 Formal Definition of PDA</h2>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Pushdown Automaton</div>
+                        <p>A <strong>Pushdown Automaton (PDA)</strong> is a 7-tuple P = (Q, Sigma, Gamma, delta, q0, Z0, F) where:</p>
+                        <ul>
+                            <li><code>Q</code> = Finite set of states</li>
+                            <li><code>Sigma</code> = Input alphabet</li>
+                            <li><code>Gamma</code> = Stack alphabet</li>
+                            <li><code>delta: Q x (Sigma U {epsilon}) x Gamma -> P(Q x Gamma*)</code> = Transition function</li>
+                            <li><code>q0 in Q</code> = Initial state</li>
+                            <li><code>Z0 in Gamma</code> = Initial stack symbol (bottom marker)</li>
+                            <li><code>F subset of Q</code> = Set of final states</li>
+                        </ul>
+                    </div>
+
+                    <h3>Understanding the Transition Function</h3>
+                    <p>The transition function delta(q, a, X) specifies:</p>
+                    <ul>
+                        <li><strong>Current state:</strong> q</li>
+                        <li><strong>Current input:</strong> a (or epsilon for no input consumption)</li>
+                        <li><strong>Top of stack:</strong> X (always popped)</li>
+                        <li><strong>Result:</strong> Set of (new state, string to push) pairs</li>
+                    </ul>
+
+                    <div class="note-box">
+                        <div class="box-title">Transition Notation</div>
+                        <p>A transition (p, gamma) in delta(q, a, X) means:</p>
+                        <ul>
+                            <li>In state q, reading input symbol a (or epsilon), with X on top of stack</li>
+                            <li>Move to state p</li>
+                            <li>Replace X (which is popped) with gamma (pushed left-to-right, so rightmost symbol ends on top)</li>
+                        </ul>
+                        <p><strong>Special cases:</strong></p>
+                        <ul>
+                            <li>gamma = epsilon: Pop X (don't push anything)</li>
+                            <li>gamma = X: Leave stack unchanged</li>
+                            <li>gamma = YX: Push Y on top of X</li>
+                        </ul>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: PDA for {a^n b^n : n >= 0}</div>
+                        <p>P = ({q0, q1, q2}, {a, b}, {A, Z0}, delta, q0, Z0, {q2})</p>
+
+                        <p><strong>Transitions:</strong></p>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Transition</th>
+                                    <th>Meaning</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>delta(q0, a, Z0) = {(q0, AZ0)}</td>
+                                    <td>First 'a': push A, keep Z0</td>
+                                </tr>
+                                <tr>
+                                    <td>delta(q0, a, A) = {(q0, AA)}</td>
+                                    <td>More a's: push another A</td>
+                                </tr>
+                                <tr>
+                                    <td>delta(q0, b, A) = {(q1, epsilon)}</td>
+                                    <td>First 'b': pop A, change state</td>
+                                </tr>
+                                <tr>
+                                    <td>delta(q1, b, A) = {(q1, epsilon)}</td>
+                                    <td>More b's: pop A</td>
+                                </tr>
+                                <tr>
+                                    <td>delta(q1, epsilon, Z0) = {(q2, Z0)}</td>
+                                    <td>All b's matched: accept</td>
+                                </tr>
+                                <tr>
+                                    <td>delta(q0, epsilon, Z0) = {(q2, Z0)}</td>
+                                    <td>Accept epsilon (n=0)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p><strong>Trace for "aabb":</strong></p>
+                        <pre>
+(q0, aabb, Z0)      -- Start
+|- (q0, abb, AZ0)   -- Read 'a', push A
+|- (q0, bb, AAZ0)   -- Read 'a', push A
+|- (q1, b, AZ0)     -- Read 'b', pop A
+|- (q1, epsilon, Z0) -- Read 'b', pop A
+|- (q2, epsilon, Z0) -- epsilon transition, accept</pre>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: PDA for {wcw^R : w in {a,b}*}</div>
+                        <p>This language consists of strings with a center marker 'c' where the second half is the reverse of the first.</p>
+                        <p>P = ({q0, q1, q2}, {a, b, c}, {A, B, Z0}, delta, q0, Z0, {q2})</p>
+
+                        <p><strong>Strategy:</strong></p>
+                        <ol>
+                            <li>Push symbols onto stack until 'c' is seen</li>
+                            <li>After 'c', match and pop symbols</li>
+                            <li>Accept when stack has only Z0 and input is exhausted</li>
+                        </ol>
+
+                        <p><strong>Transitions:</strong></p>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>delta(q0, a, Z0) = {(q0, AZ0)}</td>
+                                    <td>Push A for first 'a'</td>
+                                </tr>
+                                <tr>
+                                    <td>delta(q0, b, Z0) = {(q0, BZ0)}</td>
+                                    <td>Push B for first 'b'</td>
+                                </tr>
+                                <tr>
+                                    <td>delta(q0, a, A) = {(q0, AA)}</td>
+                                    <td>Push A for more a's</td>
+                                </tr>
+                                <tr>
+                                    <td>delta(q0, a, B) = {(q0, AB)}</td>
+                                    <td>Push A on B</td>
+                                </tr>
+                                <tr>
+                                    <td>delta(q0, b, A) = {(q0, BA)}</td>
+                                    <td>Push B on A</td>
+                                </tr>
+                                <tr>
+                                    <td>delta(q0, b, B) = {(q0, BB)}</td>
+                                    <td>Push B for more b's</td>
+                                </tr>
+                                <tr>
+                                    <td>delta(q0, c, A) = {(q1, A)}</td>
+                                    <td>See 'c', change state</td>
+                                </tr>
+                                <tr>
+                                    <td>delta(q0, c, B) = {(q1, B)}</td>
+                                    <td>See 'c', change state</td>
+                                </tr>
+                                <tr>
+                                    <td>delta(q0, c, Z0) = {(q1, Z0)}</td>
+                                    <td>Handle w = epsilon case</td>
+                                </tr>
+                                <tr>
+                                    <td>delta(q1, a, A) = {(q1, epsilon)}</td>
+                                    <td>Match 'a', pop A</td>
+                                </tr>
+                                <tr>
+                                    <td>delta(q1, b, B) = {(q1, epsilon)}</td>
+                                    <td>Match 'b', pop B</td>
+                                </tr>
+                                <tr>
+                                    <td>delta(q1, epsilon, Z0) = {(q2, Z0)}</td>
+                                    <td>All matched, accept</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p><strong>Trace for "abcba":</strong></p>
+                        <pre>
+(q0, abcba, Z0)
+|- (q0, bcba, AZ0)    -- Push A
+|- (q0, cba, BAZ0)    -- Push B
+|- (q1, ba, BAZ0)     -- See 'c', change state
+|- (q1, a, AZ0)       -- Match 'b', pop B
+|- (q1, epsilon, Z0)  -- Match 'a', pop A
+|- (q2, epsilon, Z0)  -- Accept</pre>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: PDA for Balanced Parentheses</div>
+                        <p>L = {w in {(, )}* : w has balanced parentheses}</p>
+                        <p>P = ({q0, q1}, {(, )}, {X, Z0}, delta, q0, Z0, {q1})</p>
+
+                        <p><strong>Transitions:</strong></p>
+                        <ul>
+                            <li>delta(q0, (, Z0) = {(q0, XZ0)} - Push X for first (</li>
+                            <li>delta(q0, (, X) = {(q0, XX)} - Push X for nested (</li>
+                            <li>delta(q0, ), X) = {(q0, epsilon)} - Pop X for matching )</li>
+                            <li>delta(q0, epsilon, Z0) = {(q1, Z0)} - Accept when balanced</li>
+                        </ul>
+
+                        <p><strong>Trace for "(())":</strong></p>
+                        <pre>
+(q0, (()), Z0)
+|- (q0, ()), XZ0)     -- Push X for first (
+|- (q0, )), XXZ0)     -- Push X for second (
+|- (q0, ), XZ0)       -- Pop X for first )
+|- (q0, epsilon, Z0)  -- Pop X for second )
+|- (q1, epsilon, Z0)  -- Accept</pre>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: PDA for {a^n b^m : n > m}</div>
+                        <p>More a's than b's.</p>
+                        <p>P = ({q0, q1, q2}, {a, b}, {A, Z0}, delta, q0, Z0, {q2})</p>
+
+                        <p><strong>Strategy:</strong> Push for each 'a', pop for each 'b'. Accept only if stack has at least one A remaining after all b's.</p>
+
+                        <p><strong>Transitions:</strong></p>
+                        <ul>
+                            <li>delta(q0, a, Z0) = {(q0, AZ0)}</li>
+                            <li>delta(q0, a, A) = {(q0, AA)}</li>
+                            <li>delta(q0, b, A) = {(q1, epsilon)}</li>
+                            <li>delta(q1, b, A) = {(q1, epsilon)}</li>
+                            <li>delta(q1, epsilon, A) = {(q2, A)} - At least one A remains</li>
+                            <li>delta(q0, epsilon, A) = {(q2, A)} - n > 0, m = 0 case</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Section 4.3 -->
+                <section id="pda-moves">
+                    <h2>4.3 Moves and Configurations</h2>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Instantaneous Description (ID)</div>
+                        <p>An <strong>Instantaneous Description (ID)</strong> or <strong>configuration</strong> of a PDA is a triple (q, w, gamma) where:</p>
+                        <ul>
+                            <li><code>q</code> = Current state</li>
+                            <li><code>w</code> = Remaining input (unread portion)</li>
+                            <li><code>gamma</code> = Current stack contents (leftmost = top)</li>
+                        </ul>
+                    </div>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Move Relation</div>
+                        <p>The <strong>move relation</strong> |- is defined as:</p>
+                        <p>(q, aw, X gamma) |- (p, w, beta gamma)</p>
+                        <p>if (p, beta) in delta(q, a, X), where a in Sigma U {epsilon}.</p>
+                        <p>Use |-* for zero or more moves (reflexive transitive closure).</p>
+                    </div>
+
+                    <h3>Types of Moves</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Move Type</th>
+                                <th>Description</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Read move</td>
+                                <td>Consume input symbol</td>
+                                <td>(q, ab, XY) |- (p, b, ZY) on delta(q, a, X) = {(p, Z)}</td>
+                            </tr>
+                            <tr>
+                                <td>Epsilon move</td>
+                                <td>No input consumed</td>
+                                <td>(q, ab, XY) |- (p, ab, ZY) on delta(q, epsilon, X) = {(p, Z)}</td>
+                            </tr>
+                            <tr>
+                                <td>Push</td>
+                                <td>Add to stack</td>
+                                <td>Replace X with AB (A on top)</td>
+                            </tr>
+                            <tr>
+                                <td>Pop</td>
+                                <td>Remove from stack</td>
+                                <td>Replace X with epsilon</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- Section 4.4 -->
+                <section id="acceptance">
+                    <h2>4.4 Acceptance Methods</h2>
+
+                    <p>PDAs can accept strings in two different ways:</p>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Acceptance by Final State</div>
+                        <p>The language accepted by PDA P by <strong>final state</strong> is:</p>
+                        <p><code>L(P) = {w : (q0, w, Z0) |-* (q, epsilon, gamma) for some q in F and any gamma}</code></p>
+                        <p>The input is consumed, and we end in a final state (stack contents don't matter).</p>
+                    </div>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Acceptance by Empty Stack</div>
+                        <p>The language accepted by PDA P by <strong>empty stack</strong> is:</p>
+                        <p><code>N(P) = {w : (q0, w, Z0) |-* (q, epsilon, epsilon) for any q}</code></p>
+                        <p>The input is consumed, and the stack is empty (state doesn't matter).</p>
+                    </div>
+
+                    <div class="theorem-box">
+                        <div class="box-title">Theorem: Equivalence of Acceptance Methods</div>
+                        <p>For every PDA P accepting by final state, there exists a PDA P' accepting by empty stack such that L(P) = N(P'), and vice versa.</p>
+                    </div>
+
+                    <h3>Conversion: Final State to Empty Stack</h3>
+                    <div class="algorithm">
+                        <div class="algorithm-title">Algorithm: Final State to Empty Stack</div>
+                        <ol>
+                            <li>Add new initial state q0' and new stack symbol X0</li>
+                            <li>Push X0, then Z0, then go to original start state</li>
+                            <li>From any final state, add epsilon transitions to new state qe</li>
+                            <li>From qe, pop everything (loop popping all stack symbols)</li>
+                        </ol>
+                    </div>
+
+                    <h3>Conversion: Empty Stack to Final State</h3>
+                    <div class="algorithm">
+                        <div class="algorithm-title">Algorithm: Empty Stack to Final State</div>
+                        <ol>
+                            <li>Add new initial state q0' and new stack symbol X0</li>
+                            <li>Push X0, then Z0, then go to original start state</li>
+                            <li>Add new final state qf</li>
+                            <li>Whenever X0 is on top (stack otherwise empty), transition to qf</li>
+                        </ol>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: PDA Accepting by Empty Stack</div>
+                        <p>PDA for {a^n b^n : n >= 1} accepting by empty stack:</p>
+                        <pre>
+delta(q0, a, Z0) = {(q0, AZ0)}    -- First a
+delta(q0, a, A) = {(q0, AA)}      -- More a's
+delta(q0, b, A) = {(q1, epsilon)} -- First b, pop
+delta(q1, b, A) = {(q1, epsilon)} -- More b's, pop
+delta(q1, epsilon, Z0) = {(q1, epsilon)} -- Pop Z0, stack empty</pre>
+                        <p>When stack becomes empty and input is exhausted, string is accepted.</p>
+                    </div>
+
+                    <div class="warning-box">
+                        <div class="box-title">Common Mistake</div>
+                        <p>With empty stack acceptance, the stack must be COMPLETELY empty - including the initial stack symbol Z0. Don't forget to pop Z0 at the end.</p>
+                    </div>
+                </section>
+
+                <!-- Section 4.5 -->
+                <section id="npda-dpda">
+                    <h2>4.5 NPDA vs DPDA</h2>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Deterministic PDA (DPDA)</div>
+                        <p>A PDA P = (Q, Sigma, Gamma, delta, q0, Z0, F) is <strong>deterministic</strong> if for all q in Q, a in Sigma U {epsilon}, and X in Gamma:</p>
+                        <ol>
+                            <li>|delta(q, a, X)| <= 1 for all a in Sigma U {epsilon}</li>
+                            <li>If delta(q, epsilon, X) is not empty, then delta(q, a, X) = empty for all a in Sigma</li>
+                        </ol>
+                        <p>Condition 2 ensures no choice between epsilon-move and read-move.</p>
+                    </div>
+
+                    <h3>NPDA vs DPDA Comparison</h3>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Property</th>
+                                <th>NPDA</th>
+                                <th>DPDA</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Languages recognized</td>
+                                <td>All CFLs</td>
+                                <td>Only DCFLs (proper subset)</td>
+                            </tr>
+                            <tr>
+                                <td>Transitions per config</td>
+                                <td>Multiple possible</td>
+                                <td>At most one</td>
+                            </tr>
+                            <tr>
+                                <td>Epsilon with read</td>
+                                <td>Can have both</td>
+                                <td>Mutually exclusive</td>
+                            </tr>
+                            <tr>
+                                <td>Parsing efficiency</td>
+                                <td>Slower (backtracking)</td>
+                                <td>Linear time O(n)</td>
+                            </tr>
+                            <tr>
+                                <td>Complement closure</td>
+                                <td>Not closed</td>
+                                <td>Closed</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="theorem-box">
+                        <div class="box-title">Theorem: NPDA > DPDA</div>
+                        <p>There exist context-free languages that cannot be recognized by any DPDA. Thus, NPDA are strictly more powerful than DPDA.</p>
+                        <p>Example: L = {ww^R : w in {a,b}*} (palindromes of even length) is CFL but not DCFL.</p>
+                    </div>
+                </section>
+
+                <!-- Section 4.6 -->
+                <section id="dcfl">
+                    <h2>4.6 Deterministic Context-Free Languages (DCFL)</h2>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: DCFL</div>
+                        <p>A language L is a <strong>Deterministic Context-Free Language (DCFL)</strong> if it is accepted by some DPDA by final state.</p>
+                    </div>
+
+                    <h3>Properties of DCFL</h3>
+                    <ul>
+                        <li>DCFL is a proper subset of CFL</li>
+                        <li>All regular languages are DCFL</li>
+                        <li>DCFL is closed under complementation</li>
+                        <li>DCFL is NOT closed under union, intersection, or concatenation</li>
+                        <li>DCFL languages have unambiguous grammars</li>
+                    </ul>
+
+                    <h3>Examples</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Language</th>
+                                <th>DCFL?</th>
+                                <th>Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{a^n b^n : n >= 0}</td>
+                                <td>Yes</td>
+                                <td>DPDA can count and match</td>
+                            </tr>
+                            <tr>
+                                <td>{wcw^R : w in {a,b}*}</td>
+                                <td>Yes</td>
+                                <td>Center marker c indicates when to switch</td>
+                            </tr>
+                            <tr>
+                                <td>{ww^R : w in {a,b}*}</td>
+                                <td>No</td>
+                                <td>No way to know where middle is</td>
+                            </tr>
+                            <tr>
+                                <td>{a^n b^m : n != m}</td>
+                                <td>No</td>
+                                <td>Inherently ambiguous</td>
+                            </tr>
+                            <tr>
+                                <td>Balanced parentheses</td>
+                                <td>Yes</td>
+                                <td>DPDA counts nesting depth</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="note-box">
+                        <div class="box-title">DCFL and Parsing</div>
+                        <p>DCFLs correspond to languages parseable by LR(k) parsers. Most programming languages are designed to be DCFL for efficient parsing.</p>
+                    </div>
+                </section>
+
+                <!-- Section 4.7 -->
+                <section id="pda-cfg">
+                    <h2>4.7 PDA and CFG Equivalence</h2>
+
+                    <div class="theorem-box">
+                        <div class="box-title">Theorem: PDA-CFG Equivalence</div>
+                        <p>A language L is context-free if and only if there exists a PDA P such that L = L(P) (or L = N(P)).</p>
+                        <p>Equivalently: CFG and PDA define the same class of languages.</p>
+                    </div>
+
+                    <h3>Proof Outline</h3>
+                    <ul>
+                        <li><strong>CFG to PDA:</strong> Construct a PDA that simulates leftmost derivations</li>
+                        <li><strong>PDA to CFG:</strong> Construct a grammar where variables encode "going from state p to q while popping symbol X"</li>
+                    </ul>
+                </section>
+
+                <!-- Section 4.8 -->
+                <section id="cfg-to-pda">
+                    <h2>4.8 CFG to PDA Construction</h2>
+
+                    <div class="algorithm">
+                        <div class="algorithm-title">Algorithm: CFG to PDA (Empty Stack Acceptance)</div>
+                        <p>Given CFG G = (V, T, P, S), construct PDA:</p>
+                        <p>P = ({q}, T, V U T, delta, q, S, empty)</p>
+                        <ol>
+                            <li><strong>Single state q</strong> (all work done via stack)</li>
+                            <li><strong>Stack alphabet:</strong> Variables and terminals</li>
+                            <li><strong>Initial stack:</strong> Start symbol S</li>
+                            <li><strong>Transitions:</strong>
+                                <ul>
+                                    <li>For each production A -> alpha: delta(q, epsilon, A) includes (q, alpha)</li>
+                                    <li>For each terminal a: delta(q, a, a) = {(q, epsilon)}</li>
+                                </ul>
+                            </li>
+                        </ol>
+                        <p>Accept when stack is empty and input is consumed.</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: CFG to PDA</div>
+                        <p>Grammar G:</p>
+                        <pre>
+S -> aSb | epsilon</pre>
+
+                        <p><strong>PDA transitions:</strong></p>
+                        <ul>
+                            <li>delta(q, epsilon, S) = {(q, aSb), (q, epsilon)}</li>
+                            <li>delta(q, a, a) = {(q, epsilon)}</li>
+                            <li>delta(q, b, b) = {(q, epsilon)}</li>
+                        </ul>
+
+                        <p><strong>Trace for "aabb":</strong></p>
+                        <pre>
+(q, aabb, S)
+|- (q, aabb, aSb)      -- Apply S -> aSb
+|- (q, abb, Sb)        -- Match 'a'
+|- (q, abb, aSbb)      -- Apply S -> aSb
+|- (q, bb, Sbb)        -- Match 'a'
+|- (q, bb, bb)         -- Apply S -> epsilon
+|- (q, b, b)           -- Match 'b'
+|- (q, epsilon, epsilon) -- Match 'b', stack empty, ACCEPT</pre>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: CFG to PDA for Expression Grammar</div>
+                        <p>Grammar G:</p>
+                        <pre>
+E -> E + T | T
+T -> T * F | F
+F -> (E) | id</pre>
+
+                        <p><strong>PDA transitions:</strong></p>
+                        <p>For each production A -> alpha, add delta(q, epsilon, A) contains (q, alpha)</p>
+                        <ul>
+                            <li>delta(q, epsilon, E) = {(q, E+T), (q, T)}</li>
+                            <li>delta(q, epsilon, T) = {(q, T*F), (q, F)}</li>
+                            <li>delta(q, epsilon, F) = {(q, (E)), (q, id)}</li>
+                        </ul>
+                        <p>For each terminal a, add delta(q, a, a) = {(q, epsilon)}</p>
+                        <ul>
+                            <li>delta(q, +, +) = {(q, epsilon)}</li>
+                            <li>delta(q, *, *) = {(q, epsilon)}</li>
+                            <li>delta(q, (, () = {(q, epsilon)}</li>
+                            <li>delta(q, ), )) = {(q, epsilon)}</li>
+                            <li>delta(q, id, id) = {(q, epsilon)}</li>
+                        </ul>
+
+                        <p><strong>Trace for "id+id":</strong></p>
+                        <pre>
+(q, id+id, E)
+|- (q, id+id, E+T)       -- E -> E+T
+|- (q, id+id, T+T)       -- E -> T
+|- (q, id+id, F+T)       -- T -> F
+|- (q, id+id, id+T)      -- F -> id
+|- (q, +id, +T)          -- Match 'id'
+|- (q, id, T)            -- Match '+'
+|- (q, id, F)            -- T -> F
+|- (q, id, id)           -- F -> id
+|- (q, epsilon, epsilon) -- Match 'id', ACCEPT</pre>
+                    </div>
+
+                    <div class="note-box">
+                        <div class="box-title">Understanding CFG to PDA Semantics</div>
+                        <p>The PDA simulates a <strong>leftmost derivation</strong>:</p>
+                        <ul>
+                            <li>Stack holds the "remaining" part of the sentential form to derive</li>
+                            <li>When a variable is on top, replace it with a production's RHS</li>
+                            <li>When a terminal is on top, match it with input (pop if match)</li>
+                            <li>This is exactly what top-down parsers do!</li>
+                        </ul>
+                    </div>
+
+                    <h3>PDA to CFG Construction</h3>
+                    <div class="algorithm">
+                        <div class="algorithm-title">Algorithm: PDA to CFG</div>
+                        <p>Given PDA P = (Q, Sigma, Gamma, delta, q0, Z0, F) accepting by empty stack:</p>
+                        <ol>
+                            <li>Variables: [pXq] for all p, q in Q and X in Gamma
+                                <br>Meaning: Process input that takes PDA from (p, X) to (q, epsilon) (X popped)</li>
+                            <li>Start: S, with S -> [q0 Z0 q] for all q in Q</li>
+                            <li>For each delta(p, a, X) containing (r, Y1Y2...Yk):
+                                <br>Add production [pXq] -> a[rY1r1][r1Y2r2]...[rk-1Ykq]
+                                <br>for all possible choices of r1, r2, ..., rk-1 in Q</li>
+                            <li>If delta(p, a, X) contains (q, epsilon):
+                                <br>Add production [pXq] -> a</li>
+                        </ol>
+                    </div>
+
+                    <div class="warning-box">
+                        <div class="box-title">Note</div>
+                        <p>The PDA to CFG construction can create O(|Q|^2 * |Gamma|) variables and even more productions. This is mainly of theoretical importance.</p>
+                    </div>
+                </section>
+
+                <!-- Section 4.9 -->
+                <section id="two-stack">
+                    <h2>4.9 Two-Stack PDA</h2>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Two-Stack PDA</div>
+                        <p>A <strong>Two-Stack PDA</strong> is a PDA with two independent stacks instead of one. The transition function can read from and write to both stacks.</p>
+                    </div>
+
+                    <div class="theorem-box">
+                        <div class="box-title">Theorem: Two-Stack PDA Power</div>
+                        <p>A two-stack PDA is equivalent in power to a Turing Machine. It can recognize all recursively enumerable languages, not just context-free languages.</p>
+                    </div>
+
+                    <h3>Why Two Stacks = Turing Machine?</h3>
+                    <ul>
+                        <li>Two stacks can simulate a tape: one stack for left of head, one for right</li>
+                        <li>Moving head left: pop from left stack, push to right stack</li>
+                        <li>Moving head right: pop from right stack, push to left stack</li>
+                        <li>The current cell is always the top of one stack</li>
+                    </ul>
+
+                    <div class="note-box">
+                        <div class="box-title">Implications</div>
+                        <p>This shows a sharp boundary in computational power:</p>
+                        <ul>
+                            <li>0 stacks (DFA): Regular languages only</li>
+                            <li>1 stack (PDA): Context-free languages</li>
+                            <li>2+ stacks: Turing-equivalent (all RE languages)</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Section 4.10 -->
+                <section id="pumping-cfl">
+                    <h2>4.10 Pumping Lemma for Context-Free Languages</h2>
+
+                    <div class="theorem-box">
+                        <div class="box-title">Theorem: Pumping Lemma for CFL</div>
+                        <p>If L is a context-free language, then there exists a constant p (pumping length) such that for every string w in L with |w| >= p, w can be written as w = uvxyz where:</p>
+                        <ol>
+                            <li><code>|vxy| <= p</code> (middle section is bounded)</li>
+                            <li><code>|vy| > 0</code> (v and y are not both empty)</li>
+                            <li><code>uv^i xy^i z in L for all i >= 0</code> (can pump v and y together)</li>
+                        </ol>
+                    </div>
+
+                    <div class="note-box">
+                        <div class="box-title">Understanding the CFL Pumping Lemma</div>
+                        <p>For a grammar in CNF with m variables:</p>
+                        <ul>
+                            <li>If parse tree height > m, some variable must repeat on a path</li>
+                            <li>Repeating variable means we can pump: expand more or fewer times</li>
+                            <li>p = 2^m (longest string from tree of height m)</li>
+                        </ul>
+                        <div class="diagram-container">
+                            <svg width="280" height="180" viewBox="0 0 280 180">
+                                <!-- Parse tree shape -->
+                                <path d="M 140 10 L 60 80 L 20 150 M 60 80 L 80 150" fill="none" stroke="#1a365d" stroke-width="1.5"/>
+                                <path d="M 140 10 L 220 80 L 260 150 M 220 80 L 200 150" fill="none" stroke="#1a365d" stroke-width="1.5"/>
+
+                                <!-- Inner subtree (v,x,y) -->
+                                <path d="M 140 50 L 100 100 L 90 140 M 100 100 L 110 140" fill="none" stroke="#3182ce" stroke-width="2"/>
+                                <path d="M 140 50 L 180 100 L 190 140 M 180 100 L 170 140" fill="none" stroke="#3182ce" stroke-width="2"/>
+
+                                <!-- Labels -->
+                                <text x="140" y="8" text-anchor="middle" font-family="Georgia" font-size="12">S</text>
+                                <circle cx="140" cy="50" r="10" fill="white" stroke="#3182ce" stroke-width="2"/>
+                                <text x="140" y="54" text-anchor="middle" font-family="Georgia" font-size="10">A</text>
+                                <circle cx="140" cy="100" r="8" fill="white" stroke="#3182ce" stroke-width="2"/>
+                                <text x="140" y="104" text-anchor="middle" font-family="Georgia" font-size="9">A</text>
+
+                                <!-- Yield labels -->
+                                <text x="35" y="165" text-anchor="middle" font-family="Georgia" font-size="11">u</text>
+                                <text x="80" y="165" text-anchor="middle" font-family="Georgia" font-size="11">v</text>
+                                <text x="140" y="165" text-anchor="middle" font-family="Georgia" font-size="11">x</text>
+                                <text x="200" y="165" text-anchor="middle" font-family="Georgia" font-size="11">y</text>
+                                <text x="245" y="165" text-anchor="middle" font-family="Georgia" font-size="11">z</text>
+
+                                <!-- Braces -->
+                                <path d="M 70 155 Q 75 175, 100 155" fill="none" stroke="#3182ce" stroke-width="1"/>
+                                <path d="M 120 155 Q 140 175, 160 155" fill="none" stroke="#3182ce" stroke-width="1"/>
+                                <path d="M 180 155 Q 190 175, 210 155" fill="none" stroke="#3182ce" stroke-width="1"/>
+                            </svg>
+                            <p class="diagram-caption">Figure 4.2: Parse tree showing repeating variable A and pumpable sections v, y</p>
+                        </div>
+                    </div>
+
+                    <h3>Using the CFL Pumping Lemma</h3>
+                    <div class="algorithm">
+                        <div class="algorithm-title">Proof Template: Proving L is not CFL</div>
+                        <ol>
+                            <li>Assume L is context-free (for contradiction)</li>
+                            <li>Let p be the pumping length</li>
+                            <li>Choose a string w in L with |w| >= p (choose wisely!)</li>
+                            <li>Consider all ways to write w = uvxyz with |vxy| <= p and |vy| > 0</li>
+                            <li>Show for some i >= 0, uv^i xy^i z is NOT in L</li>
+                            <li>Contradiction - L is not context-free</li>
+                        </ol>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example 1: Prove {a^n b^n c^n : n >= 0} is not CFL</div>
+                        <p><strong>Proof:</strong></p>
+                        <ol>
+                            <li>Assume L = {a^n b^n c^n} is context-free.</li>
+                            <li>Let p be the pumping length.</li>
+                            <li>Choose w = a^p b^p c^p. Clearly w in L and |w| = 3p >= p.</li>
+                            <li>Consider w = uvxyz with |vxy| <= p and |vy| >= 1.
+                                <br>Since |vxy| <= p, the substring vxy cannot contain all three symbols a, b, c.
+                                <br>Therefore, vy contains at most two different symbols.</li>
+                            <li>Consider uv^2 xy^2 z (pumping with i = 2).
+                                <br>Since vy contains at most two different symbols, pumping increases the count of at most two symbols.
+                                <br>This means the three counts are no longer equal.
+                                <br>So uv^2 xy^2 z is NOT in L.</li>
+                            <li>Contradiction. L is not context-free.</li>
+                        </ol>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example 2: Prove {a^n b^n c^n d^n : n >= 0} is not CFL</div>
+                        <p><strong>Proof:</strong> (Similar approach)</p>
+                        <ol>
+                            <li>Assume L is CFL with pumping length p.</li>
+                            <li>Choose w = a^p b^p c^p d^p.</li>
+                            <li>Since |vxy| <= p, vxy spans at most two consecutive symbol groups.</li>
+                            <li>Pumping changes counts of at most two symbols, breaking the a=b=c=d requirement.</li>
+                            <li>Contradiction. L is not CFL.</li>
+                        </ol>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example 3: Prove {ww : w in {a,b}*} is not CFL</div>
+                        <p><strong>Proof:</strong></p>
+                        <ol>
+                            <li>Assume L = {ww} is CFL with pumping length p.</li>
+                            <li>Choose w = a^p b^p a^p b^p (which is (a^p b^p)(a^p b^p), so in L).</li>
+                            <li>Since |vxy| <= p, and the string has 4 blocks of length p each, vxy lies entirely within at most 2 consecutive blocks.</li>
+                            <li>Case analysis: vxy is in first a-block, first b-block, middle a-blocks boundary, etc.</li>
+                            <li>In each case, pumping destroys the ww structure.</li>
+                            <li>For instance, if vxy is in the first a^p: pumping gives a^(p+k) b^p a^p b^p for some k > 0.
+                                <br>For this to be ww, the first half length must equal second half, but (p+k)+p != p+p.</li>
+                            <li>Contradiction. L is not CFL.</li>
+                        </ol>
+                    </div>
+
+                    <div class="warning-box">
+                        <div class="box-title">Common Mistakes with CFL Pumping Lemma</div>
+                        <ul>
+                            <li><strong>Wrong constraint:</strong> In CFL pumping, |vxy| <= p, not |uv| <= p like regular pumping</li>
+                            <li><strong>Pumping both v and y:</strong> You must pump BOTH v and y the same number of times</li>
+                            <li><strong>Forgetting vy is not both empty:</strong> Either v or y (or both) is non-empty</li>
+                            <li><strong>Wrong direction:</strong> Like regular pumping, this only proves non-membership in CFL, not membership</li>
+                        </ul>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example 4: Prove {a^i b^j c^k : i < j < k} is not CFL</div>
+                        <p><strong>Proof:</strong></p>
+                        <ol>
+                            <li>Assume L is CFL with pumping length p.</li>
+                            <li>Choose w = a^p b^(p+1) c^(p+2). This satisfies p < p+1 < p+2.</li>
+                            <li>Consider any split w = uvxyz with |vxy| <= p and |vy| >= 1.</li>
+                            <li>Case 1: vxy contains only a's. Pumping up increases #a, may violate a < b.</li>
+                            <li>Case 2: vxy contains only b's. Pumping up increases #b, may violate b < c.</li>
+                            <li>Case 3: vxy contains only c's. Pumping down decreases #c, may violate b < c.</li>
+                            <li>Case 4: vxy spans a's and b's. Pumping changes both, can break ordering.</li>
+                            <li>Case 5: vxy spans b's and c's. Similar analysis.</li>
+                            <li>In all cases, we can find an i where uv^i xy^i z is not in L.</li>
+                            <li>Contradiction. L is not CFL.</li>
+                        </ol>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example 5: Prove {a^(n^2) : n >= 0} is not CFL</div>
+                        <p><strong>Proof:</strong></p>
+                        <ol>
+                            <li>Assume L is CFL with pumping length p.</li>
+                            <li>Choose w = a^(p^2). Then |w| = p^2, which is >= p.</li>
+                            <li>By pumping lemma, w = uvxyz with |vxy| <= p and |vy| >= 1.</li>
+                            <li>Let |vy| = k where 1 <= k <= p.</li>
+                            <li>Consider uv^2 xy^2 z = a^(p^2 + k).</li>
+                            <li>We need p^2 + k to be a perfect square.</li>
+                            <li>But p^2 < p^2 + k <= p^2 + p < (p+1)^2 = p^2 + 2p + 1 (since k <= p < 2p+1).</li>
+                            <li>So p^2 + k is strictly between p^2 and (p+1)^2, hence not a perfect square.</li>
+                            <li>Therefore uv^2 xy^2 z is not in L. Contradiction.</li>
+                            <li>L is not context-free.</li>
+                        </ol>
+                    </div>
+
+                    <div class="exam-tip-box">
+                        <div class="box-title">CFL Pumping Lemma Exam Strategy</div>
+                        <ol>
+                            <li><strong>Choose wisely:</strong> Pick w that makes case analysis easy. Often w = a^p b^p c^p type strings work well.</li>
+                            <li><strong>Use |vxy| <= p:</strong> This limits where the "pumpable" section can be. It can't span three different symbol groups!</li>
+                            <li><strong>Consider pumping down:</strong> Setting i = 0 gives uv^0 xy^0 z = uxz, which removes v and y.</li>
+                            <li><strong>Remember v and y:</strong> Unlike regular pumping lemma, you pump TWO parts simultaneously.</li>
+                        </ol>
+                    </div>
+                </section>
+
+                <!-- Section 4.11 -->
+                <section id="closure-cfl">
+                    <h2>4.11 Closure Properties of CFL</h2>
+
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Operation</th>
+                                <th>Closed?</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Union</td>
+                                <td>Yes</td>
+                                <td>S -> S1 | S2</td>
+                            </tr>
+                            <tr>
+                                <td>Concatenation</td>
+                                <td>Yes</td>
+                                <td>S -> S1 S2</td>
+                            </tr>
+                            <tr>
+                                <td>Kleene Star</td>
+                                <td>Yes</td>
+                                <td>S -> S1 S | epsilon</td>
+                            </tr>
+                            <tr>
+                                <td>Intersection</td>
+                                <td>No</td>
+                                <td>{a^n b^n c^m} intersection {a^m b^n c^n} = {a^n b^n c^n}</td>
+                            </tr>
+                            <tr>
+                                <td>Complement</td>
+                                <td>No</td>
+                                <td>Would imply intersection closure by De Morgan</td>
+                            </tr>
+                            <tr>
+                                <td>Difference</td>
+                                <td>No</td>
+                                <td>L1 - L2 = L1 intersection L2'</td>
+                            </tr>
+                            <tr>
+                                <td>Reversal</td>
+                                <td>Yes</td>
+                                <td>Reverse all productions</td>
+                            </tr>
+                            <tr>
+                                <td>Homomorphism</td>
+                                <td>Yes</td>
+                                <td>Apply to terminal productions</td>
+                            </tr>
+                            <tr>
+                                <td>Inverse Homomorphism</td>
+                                <td>Yes</td>
+                                <td>More complex construction</td>
+                            </tr>
+                            <tr>
+                                <td>Intersection with Regular</td>
+                                <td>Yes</td>
+                                <td>Product construction PDA x DFA</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="theorem-box">
+                        <div class="box-title">Theorem: CFL intersection Regular = CFL</div>
+                        <p>If L1 is context-free and L2 is regular, then L1 intersection L2 is context-free.</p>
+                        <p><strong>Proof idea:</strong> Run PDA for L1 in parallel with DFA for L2. Accept when both accept.</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: Using Closure Properties</div>
+                        <p>Prove {a^n b^n c^n} is not CFL using closure properties:</p>
+                        <ol>
+                            <li>Suppose L = {a^n b^n c^n} is CFL.</li>
+                            <li>Let R = a*b*c* (regular).</li>
+                            <li>L intersection R = L (since L is a subset of R).</li>
+                            <li>CFL intersection Regular should be CFL.</li>
+                            <li>But we proved L is not CFL using pumping lemma.</li>
+                            <li>Contradiction. (This confirms our pumping lemma proof.)</li>
+                        </ol>
+                    </div>
+
+                    <div class="note-box">
+                        <div class="box-title">DCFL Closure Properties</div>
+                        <p>DCFLs have different closure properties:</p>
+                        <ul>
+                            <li>Closed under: Complement, intersection with regular</li>
+                            <li>Not closed under: Union, intersection, concatenation, Kleene star</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Section 4.12 -->
+                <section id="decision-cfl">
+                    <h2>4.12 Decision Problems for CFL</h2>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Problem</th>
+                                <th>Decidable?</th>
+                                <th>Algorithm/Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Membership: w in L(G)?</td>
+                                <td>Yes</td>
+                                <td>CYK algorithm O(n^3)</td>
+                            </tr>
+                            <tr>
+                                <td>Emptiness: L(G) = empty?</td>
+                                <td>Yes</td>
+                                <td>Check if start symbol is generating</td>
+                            </tr>
+                            <tr>
+                                <td>Finiteness: Is L(G) finite?</td>
+                                <td>Yes</td>
+                                <td>Check for cycles in useful variables</td>
+                            </tr>
+                            <tr>
+                                <td>Equivalence: L(G1) = L(G2)?</td>
+                                <td>No</td>
+                                <td>Undecidable in general</td>
+                            </tr>
+                            <tr>
+                                <td>Universality: L(G) = Sigma*?</td>
+                                <td>No</td>
+                                <td>Undecidable</td>
+                            </tr>
+                            <tr>
+                                <td>Containment: L(G1) subset L(G2)?</td>
+                                <td>No</td>
+                                <td>Undecidable</td>
+                            </tr>
+                            <tr>
+                                <td>Ambiguity: Is G ambiguous?</td>
+                                <td>No</td>
+                                <td>Undecidable</td>
+                            </tr>
+                            <tr>
+                                <td>Is L inherently ambiguous?</td>
+                                <td>No</td>
+                                <td>Undecidable</td>
+                            </tr>
+                            <tr>
+                                <td>Is L regular?</td>
+                                <td>No</td>
+                                <td>Undecidable</td>
+                            </tr>
+                            <tr>
+                                <td>Is L1 intersection L2 = empty?</td>
+                                <td>No</td>
+                                <td>Undecidable</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="note-box">
+                        <div class="box-title">Contrast with Regular Languages</div>
+                        <p>For regular languages, ALL these problems are decidable. The increased power of CFLs comes with a cost: many decision problems become undecidable.</p>
+                    </div>
+
+                    <div class="exam-tip-box">
+                        <div class="box-title">Exam Tip</div>
+                        <p>Remember the decidable CFL problems: Membership, Emptiness, Finiteness. Most others (especially comparing two CFLs) are undecidable.</p>
+                    </div>
+                </section>
+
+                <!-- Unit Summary -->
+                <section id="summary" class="unit-summary">
+                    <h2>Unit IV Summary</h2>
+
+                    <h3>Key Results</h3>
+                    <ul class="key-results">
+                        <li>PDA = Finite automaton + Stack, recognizes exactly CFLs</li>
+                        <li>Final state and empty stack acceptance are equivalent</li>
+                        <li>NPDA > DPDA (some CFLs are not DCFL)</li>
+                        <li>Two-stack PDA equals Turing machine in power</li>
+                        <li>CFLs are closed under union, concatenation, Kleene star, but NOT intersection or complement</li>
+                        <li>CFL intersection Regular = CFL</li>
+                    </ul>
+
+                    <h3>PDA Definition</h3>
+                    <p>P = (Q, Sigma, Gamma, delta, q0, Z0, F)</p>
+                    <p>delta: Q x (Sigma U {epsilon}) x Gamma -> P(Q x Gamma*)</p>
+
+                    <h3>Pumping Lemma for CFL</h3>
+                    <p>w = uvxyz with |vxy| <= p, |vy| > 0, uv^i xy^i z in L for all i >= 0</p>
+
+                    <h3>Algorithms to Know</h3>
+                    <ul>
+                        <li>CFG to PDA construction (simulation of leftmost derivation)</li>
+                        <li>Final state to empty stack conversion and vice versa</li>
+                        <li>CFL pumping lemma proof structure</li>
+                    </ul>
+
+                    <h3>Common Mistakes to Avoid</h3>
+                    <ul class="common-mistakes">
+                        <li>Confusing |vxy| <= p (CFL) with |xy| <= p (regular)</li>
+                        <li>Forgetting to pump both v and y together</li>
+                        <li>Assuming CFLs are closed under intersection</li>
+                        <li>Forgetting that two-stack PDA equals Turing machine</li>
+                        <li>Assuming equivalence is decidable for CFLs</li>
+                    </ul>
+
+                    <h3>Non-CFL Examples</h3>
+                    <ul>
+                        <li>{a^n b^n c^n : n >= 0}</li>
+                        <li>{ww : w in {a,b}*}</li>
+                        <li>{a^(n^2) : n >= 0}</li>
+                    </ul>
+                </section>
+
+            </article>
+        </div>
+    </main>
+
+    <footer class="page-footer">
+        <p>TAFL Study Guide - Unit IV: Pushdown Automata and CFL Properties</p>
+        <p><a href="unit3.html">Previous: Unit III</a> | <a href="unit5.html">Next: Unit V</a></p>
+    </footer>
+</body>
+</html>

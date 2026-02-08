@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAFL Study Guide - Theory of Automata and Formal Languages</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="nav-header">
+        <nav class="nav-container">
+            <a href="index.html" class="nav-brand">TAFL Study Guide</a>
+            <div class="nav-links">
+                <a href="unit1.html">Unit I</a>
+                <a href="unit2.html">Unit II</a>
+                <a href="unit3.html">Unit III</a>
+                <a href="unit4.html">Unit IV</a>
+                <a href="unit5.html">Unit V</a>
+            </div>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>Theory of Automata and Formal Languages</h1>
+        <p>A Complete Study Guide for Engineering Undergraduates</p>
+    </section>
+
+    <main class="page-container">
+        <section>
+            <h2>About This Guide</h2>
+            <p>This comprehensive study guide covers the complete syllabus of Theory of Automata and Formal Languages (TAFL) as prescribed for Indian engineering undergraduate programs. Each unit contains detailed explanations, formal definitions, worked examples, and exam-oriented notes to help you master this fundamental subject in computer science.</p>
+        </section>
+
+        <section>
+            <h2>Course Units</h2>
+            <div class="unit-cards">
+                <div class="unit-card">
+                    <h3>Unit I: Basic Concepts and Automata Theory</h3>
+                    <ul>
+                        <li>Introduction to Theory of Computation</li>
+                        <li>Alphabet, Symbols, Strings, Languages</li>
+                        <li>Deterministic Finite Automata (DFA)</li>
+                        <li>Non-deterministic Finite Automata (NFA)</li>
+                        <li>Epsilon-NFA and Epsilon-Closure</li>
+                        <li>Moore and Mealy Machines</li>
+                        <li>DFA Minimization</li>
+                    </ul>
+                    <a href="unit1.html">Study Unit I</a>
+                </div>
+
+                <div class="unit-card">
+                    <h3>Unit II: Regular Expressions and Languages</h3>
+                    <ul>
+                        <li>Regular Expressions: Syntax and Semantics</li>
+                        <li>Transition Graphs</li>
+                        <li>Kleene's Theorem</li>
+                        <li>Arden's Theorem</li>
+                        <li>Closure Properties of Regular Languages</li>
+                        <li>Pumping Lemma for Regular Languages</li>
+                        <li>Decision Properties</li>
+                    </ul>
+                    <a href="unit2.html">Study Unit II</a>
+                </div>
+
+                <div class="unit-card">
+                    <h3>Unit III: Regular and Non-Regular Grammars</h3>
+                    <ul>
+                        <li>Context-Free Grammars (CFG)</li>
+                        <li>Derivations and Parse Trees</li>
+                        <li>Ambiguity in CFG</li>
+                        <li>Regular Grammars</li>
+                        <li>Conversions: FA to CFG and vice versa</li>
+                        <li>Chomsky Normal Form (CNF)</li>
+                        <li>Greibach Normal Form (GNF)</li>
+                        <li>Chomsky Hierarchy</li>
+                    </ul>
+                    <a href="unit3.html">Study Unit III</a>
+                </div>
+
+                <div class="unit-card">
+                    <h3>Unit IV: Pushdown Automata and CFL Properties</h3>
+                    <ul>
+                        <li>Pushdown Automata (PDA)</li>
+                        <li>NPDA and DPDA</li>
+                        <li>PDA and CFG Equivalence</li>
+                        <li>Two-Stack PDA</li>
+                        <li>Pumping Lemma for CFL</li>
+                        <li>Closure Properties of CFL</li>
+                        <li>Decision Problems for CFL</li>
+                    </ul>
+                    <a href="unit4.html">Study Unit IV</a>
+                </div>
+
+                <div class="unit-card">
+                    <h3>Unit V: Turing Machines and Recursive Function Theory</h3>
+                    <ul>
+                        <li>Turing Machine Model</li>
+                        <li>TM Variants and Modifications</li>
+                        <li>Universal Turing Machine</li>
+                        <li>Linear Bounded Automata</li>
+                        <li>Church-Turing Thesis</li>
+                        <li>Recursive and RE Languages</li>
+                        <li>Halting Problem</li>
+                        <li>Post's Correspondence Problem</li>
+                    </ul>
+                    <a href="unit5.html">Study Unit V</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="quick-reference">
+            <h2>Quick Reference: Chomsky Hierarchy</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Grammar</th>
+                        <th>Language</th>
+                        <th>Automaton</th>
+                        <th>Production Rule Form</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Type 0</td>
+                        <td>Unrestricted</td>
+                        <td>Recursively Enumerable</td>
+                        <td>Turing Machine</td>
+                        <td>alpha -> beta (no restrictions)</td>
+                    </tr>
+                    <tr>
+                        <td>Type 1</td>
+                        <td>Context-Sensitive</td>
+                        <td>Context-Sensitive</td>
+                        <td>Linear Bounded Automata</td>
+                        <td>alpha A beta -> alpha gamma beta</td>
+                    </tr>
+                    <tr>
+                        <td>Type 2</td>
+                        <td>Context-Free</td>
+                        <td>Context-Free</td>
+                        <td>Pushdown Automata</td>
+                        <td>A -> gamma</td>
+                    </tr>
+                    <tr>
+                        <td>Type 3</td>
+                        <td>Regular</td>
+                        <td>Regular</td>
+                        <td>Finite Automata</td>
+                        <td>A -> aB or A -> a</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p><strong>Note:</strong> Type 3 is a subset of Type 2, Type 2 is a subset of Type 1, and Type 1 is a subset of Type 0.</p>
+        </section>
+
+        <section class="quick-reference">
+            <h2>Important Symbols and Notation</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Meaning</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>Sigma</code></td>
+                        <td>Alphabet (finite set of symbols)</td>
+                        <td>{0, 1}, {a, b, c}</td>
+                    </tr>
+                    <tr>
+                        <td><code>Sigma*</code></td>
+                        <td>Kleene closure (all strings over alphabet)</td>
+                        <td>{epsilon, 0, 1, 00, 01, 10, 11, ...}</td>
+                    </tr>
+                    <tr>
+                        <td><code>Sigma+</code></td>
+                        <td>Positive closure (all non-empty strings)</td>
+                        <td>{0, 1, 00, 01, 10, 11, ...}</td>
+                    </tr>
+                    <tr>
+                        <td><code>epsilon</code></td>
+                        <td>Empty string (length 0)</td>
+                        <td>|epsilon| = 0</td>
+                    </tr>
+                    <tr>
+                        <td><code>|w|</code></td>
+                        <td>Length of string w</td>
+                        <td>|abc| = 3</td>
+                    </tr>
+                    <tr>
+                        <td><code>delta</code></td>
+                        <td>Transition function</td>
+                        <td>delta(q0, a) = q1</td>
+                    </tr>
+                    <tr>
+                        <td><code>delta*</code></td>
+                        <td>Extended transition function</td>
+                        <td>delta*(q0, ab) = q2</td>
+                    </tr>
+                    <tr>
+                        <td><code>L(M)</code></td>
+                        <td>Language accepted by machine M</td>
+                        <td>L(M) = {w : delta*(q0, w) in F}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>How to Use This Guide</h2>
+            <div class="note-box">
+                <div class="box-title">Study Tips</div>
+                <ul>
+                    <li><strong>Definitions:</strong> Highlighted in blue boxes. Memorize formal definitions for exam questions.</li>
+                    <li><strong>Theorems:</strong> Highlighted in green boxes. Understand the statement and proof ideas.</li>
+                    <li><strong>Examples:</strong> Highlighted in orange boxes. Practice these patterns for problem-solving.</li>
+                    <li><strong>Warnings:</strong> Highlighted in red boxes. Common mistakes to avoid.</li>
+                    <li><strong>Exam Tips:</strong> Highlighted in yellow boxes. Key points frequently asked in exams.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2>Syllabus Mapping</h2>
+            <p>This guide follows the standard TAFL syllabus prescribed by AICTE and is aligned with curricula of major Indian technical universities including:</p>
+            <ul>
+                <li>Anna University</li>
+                <li>JNTU (Jawaharlal Nehru Technological University)</li>
+                <li>VTU (Visvesvaraya Technological University)</li>
+                <li>AKTU (Abdul Kalam Technical University)</li>
+                <li>Mumbai University</li>
+                <li>Pune University</li>
+                <li>GTU (Gujarat Technological University)</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer class="page-footer">
+        <p>TAFL Study Guide - Theory of Automata and Formal Languages</p>
+        <p>For Engineering Undergraduate Students</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,758 @@
+/* ============================================
+   TAFL Study Guide - Academic Stylesheet
+   Theory of Automata and Formal Languages
+   ============================================ */
+
+/* CSS Reset and Base */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    /* Color Palette - Solid Colors Only */
+    --color-primary: #1a365d;
+    --color-secondary: #2d3748;
+    --color-text: #1a202c;
+    --color-text-light: #4a5568;
+    --color-background: #ffffff;
+    --color-background-alt: #f7fafc;
+    --color-border: #e2e8f0;
+
+    /* Box Colors */
+    --color-definition: #3182ce;
+    --color-definition-bg: #ebf8ff;
+    --color-theorem: #38a169;
+    --color-theorem-bg: #f0fff4;
+    --color-example: #dd6b20;
+    --color-example-bg: #fffaf0;
+    --color-warning: #e53e3e;
+    --color-warning-bg: #fff5f5;
+    --color-note: #805ad5;
+    --color-note-bg: #faf5ff;
+
+    /* Typography */
+    --font-heading: Georgia, 'Times New Roman', serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: Consolas, Monaco, 'Courier New', monospace;
+
+    /* Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+
+    /* Layout */
+    --max-width: 1200px;
+    --sidebar-width: 280px;
+}
+
+/* Base Typography */
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-body);
+    color: var(--color-text);
+    background-color: var(--color-background);
+    line-height: 1.7;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    color: var(--color-primary);
+    line-height: 1.3;
+    margin-top: var(--spacing-xl);
+    margin-bottom: var(--spacing-md);
+}
+
+h1 {
+    font-size: 2.5rem;
+    border-bottom: 3px solid var(--color-primary);
+    padding-bottom: var(--spacing-sm);
+}
+
+h2 {
+    font-size: 1.875rem;
+    border-bottom: 2px solid var(--color-border);
+    padding-bottom: var(--spacing-xs);
+}
+
+h3 {
+    font-size: 1.5rem;
+    color: var(--color-secondary);
+}
+
+h4 {
+    font-size: 1.25rem;
+    color: var(--color-secondary);
+}
+
+p {
+    margin-bottom: var(--spacing-md);
+}
+
+/* Links */
+a {
+    color: var(--color-definition);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Navigation Header */
+.nav-header {
+    background-color: var(--color-primary);
+    color: white;
+    padding: var(--spacing-md) var(--spacing-lg);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav-container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+}
+
+.nav-brand {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+}
+
+.nav-links {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.nav-links a {
+    color: white;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: 4px;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    text-decoration: none;
+}
+
+/* Page Layout */
+.page-container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: var(--spacing-lg);
+}
+
+.content-wrapper {
+    display: flex;
+    gap: var(--spacing-xl);
+}
+
+/* Sidebar */
+.sidebar {
+    width: var(--sidebar-width);
+    flex-shrink: 0;
+}
+
+.sidebar-nav {
+    position: sticky;
+    top: 80px;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    padding: var(--spacing-md);
+    background-color: var(--color-background-alt);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+}
+
+.sidebar-nav h3 {
+    font-size: 1rem;
+    margin-top: 0;
+    margin-bottom: var(--spacing-md);
+    color: var(--color-primary);
+}
+
+.sidebar-nav ul {
+    list-style: none;
+}
+
+.sidebar-nav li {
+    margin-bottom: var(--spacing-xs);
+}
+
+.sidebar-nav a {
+    display: block;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    color: var(--color-text);
+    font-size: 0.9rem;
+    border-left: 2px solid transparent;
+}
+
+.sidebar-nav a:hover {
+    background-color: var(--color-border);
+    text-decoration: none;
+}
+
+.sidebar-nav a.active {
+    border-left-color: var(--color-primary);
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
+.sidebar-nav ul ul {
+    margin-left: var(--spacing-md);
+}
+
+.sidebar-nav ul ul a {
+    font-size: 0.85rem;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Content Boxes */
+.definition-box,
+.theorem-box,
+.example-box,
+.warning-box,
+.note-box,
+.exam-tip-box {
+    padding: var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+    border-left: 4px solid;
+    border-radius: 0 4px 4px 0;
+}
+
+.definition-box {
+    background-color: var(--color-definition-bg);
+    border-color: var(--color-definition);
+}
+
+.theorem-box {
+    background-color: var(--color-theorem-bg);
+    border-color: var(--color-theorem);
+}
+
+.example-box {
+    background-color: var(--color-example-bg);
+    border-color: var(--color-example);
+}
+
+.warning-box {
+    background-color: var(--color-warning-bg);
+    border-color: var(--color-warning);
+}
+
+.note-box {
+    background-color: var(--color-note-bg);
+    border-color: var(--color-note);
+}
+
+.exam-tip-box {
+    background-color: #fffff0;
+    border-color: #d69e2e;
+}
+
+.box-title {
+    font-family: var(--font-heading);
+    font-weight: bold;
+    margin-bottom: var(--spacing-sm);
+    font-size: 1.1rem;
+}
+
+.definition-box .box-title { color: var(--color-definition); }
+.theorem-box .box-title { color: var(--color-theorem); }
+.example-box .box-title { color: var(--color-example); }
+.warning-box .box-title { color: var(--color-warning); }
+.note-box .box-title { color: var(--color-note); }
+.exam-tip-box .box-title { color: #b7791f; }
+
+/* Tables */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--spacing-lg) 0;
+    font-size: 0.95rem;
+}
+
+th, td {
+    padding: var(--spacing-sm) var(--spacing-md);
+    text-align: left;
+    border: 1px solid var(--color-border);
+}
+
+th {
+    background-color: var(--color-primary);
+    color: white;
+    font-weight: 600;
+}
+
+tr:nth-child(even) {
+    background-color: var(--color-background-alt);
+}
+
+tr:hover {
+    background-color: #edf2f7;
+}
+
+/* Caption for tables */
+caption {
+    font-weight: bold;
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-secondary);
+    text-align: left;
+    font-size: 1.1rem;
+}
+
+/* Code and Formal Notation */
+code {
+    font-family: var(--font-mono);
+    background-color: var(--color-background-alt);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+
+pre {
+    background-color: var(--color-background-alt);
+    padding: var(--spacing-md);
+    border-radius: 4px;
+    overflow-x: auto;
+    margin: var(--spacing-md) 0;
+    border: 1px solid var(--color-border);
+}
+
+pre code {
+    background: none;
+    padding: 0;
+}
+
+/* Mathematical Notation */
+.math {
+    font-family: var(--font-mono);
+    font-style: italic;
+}
+
+.formal-def {
+    font-family: var(--font-mono);
+    background-color: var(--color-background-alt);
+    padding: var(--spacing-md);
+    border-radius: 4px;
+    margin: var(--spacing-md) 0;
+    border: 1px solid var(--color-border);
+}
+
+.tuple {
+    font-family: var(--font-mono);
+}
+
+/* SVG Diagram Containers */
+.diagram-container {
+    margin: var(--spacing-lg) 0;
+    text-align: center;
+}
+
+.diagram-container svg {
+    max-width: 100%;
+    height: auto;
+}
+
+.diagram-caption {
+    font-size: 0.9rem;
+    color: var(--color-text-light);
+    margin-top: var(--spacing-sm);
+    font-style: italic;
+}
+
+/* Algorithm Steps */
+.algorithm {
+    background-color: var(--color-background-alt);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+}
+
+.algorithm-title {
+    font-family: var(--font-heading);
+    font-weight: bold;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-md);
+    font-size: 1.1rem;
+}
+
+.algorithm ol {
+    margin-left: var(--spacing-lg);
+}
+
+.algorithm li {
+    margin-bottom: var(--spacing-sm);
+}
+
+/* Lists */
+ul, ol {
+    margin-left: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+}
+
+li {
+    margin-bottom: var(--spacing-xs);
+}
+
+/* Transition Table Styling */
+.transition-table {
+    font-family: var(--font-mono);
+}
+
+.transition-table th:first-child,
+.transition-table td:first-child {
+    font-weight: bold;
+}
+
+.state-initial::before {
+    content: "\2192 ";
+}
+
+.state-final {
+    font-weight: bold;
+}
+
+.state-final::after {
+    content: " *";
+}
+
+/* Unit Summary Section */
+.unit-summary {
+    background-color: var(--color-background-alt);
+    border: 2px solid var(--color-primary);
+    border-radius: 4px;
+    padding: var(--spacing-xl);
+    margin-top: var(--spacing-2xl);
+}
+
+.unit-summary h2 {
+    margin-top: 0;
+    color: var(--color-primary);
+}
+
+/* Key Results List */
+.key-results {
+    list-style: none;
+    margin-left: 0;
+}
+
+.key-results li {
+    padding-left: var(--spacing-lg);
+    position: relative;
+    margin-bottom: var(--spacing-sm);
+}
+
+.key-results li::before {
+    content: "\2713";
+    position: absolute;
+    left: 0;
+    color: var(--color-theorem);
+    font-weight: bold;
+}
+
+/* Common Mistakes List */
+.common-mistakes {
+    list-style: none;
+    margin-left: 0;
+}
+
+.common-mistakes li {
+    padding-left: var(--spacing-lg);
+    position: relative;
+    margin-bottom: var(--spacing-sm);
+}
+
+.common-mistakes li::before {
+    content: "\2717";
+    position: absolute;
+    left: 0;
+    color: var(--color-warning);
+    font-weight: bold;
+}
+
+/* Index Page Specific */
+.hero {
+    text-align: center;
+    padding: var(--spacing-2xl) var(--spacing-lg);
+    background-color: var(--color-primary);
+    color: white;
+    margin: calc(-1 * var(--spacing-lg));
+    margin-bottom: var(--spacing-xl);
+}
+
+.hero h1 {
+    color: white;
+    border: none;
+    margin-top: 0;
+}
+
+.hero p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+.unit-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+    margin: var(--spacing-xl) 0;
+}
+
+.unit-card {
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: var(--spacing-lg);
+    transition: border-color 0.2s;
+}
+
+.unit-card:hover {
+    border-color: var(--color-primary);
+}
+
+.unit-card h3 {
+    margin-top: 0;
+    color: var(--color-primary);
+}
+
+.unit-card ul {
+    margin-bottom: 0;
+    font-size: 0.9rem;
+    color: var(--color-text-light);
+}
+
+.unit-card a {
+    display: inline-block;
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: var(--color-primary);
+    color: white;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.unit-card a:hover {
+    background-color: var(--color-secondary);
+    text-decoration: none;
+}
+
+/* Quick Reference Section */
+.quick-reference {
+    background-color: var(--color-background-alt);
+    padding: var(--spacing-xl);
+    border-radius: 4px;
+    margin: var(--spacing-xl) 0;
+}
+
+.quick-reference h2 {
+    margin-top: 0;
+}
+
+/* Comparison Tables */
+.comparison-table th {
+    text-align: center;
+}
+
+.comparison-table td:first-child {
+    font-weight: 600;
+}
+
+/* Solution Steps */
+.solution-steps {
+    background-color: #fffbeb;
+    border: 1px solid #fbbf24;
+    border-radius: 4px;
+    padding: var(--spacing-lg);
+    margin: var(--spacing-md) 0;
+}
+
+.solution-steps h4 {
+    margin-top: 0;
+    color: #92400e;
+}
+
+/* Footer */
+.page-footer {
+    text-align: center;
+    padding: var(--spacing-xl);
+    margin-top: var(--spacing-2xl);
+    border-top: 1px solid var(--color-border);
+    color: var(--color-text-light);
+    font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+    .content-wrapper {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        order: -1;
+    }
+
+    .sidebar-nav {
+        position: static;
+        max-height: none;
+    }
+
+    .nav-container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .nav-links {
+        justify-content: center;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .page-container {
+        padding: var(--spacing-md);
+    }
+
+    .nav-links a {
+        padding: var(--spacing-xs);
+        font-size: 0.8rem;
+    }
+
+    .unit-cards {
+        grid-template-columns: 1fr;
+    }
+
+    table {
+        font-size: 0.85rem;
+    }
+
+    th, td {
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+}
+
+/* Print Styles */
+@media print {
+    /* Hide navigation and non-essential elements */
+    .nav-header,
+    .sidebar,
+    .nav-links {
+        display: none !important;
+    }
+
+    /* Reset colors for printing */
+    body {
+        color: black;
+        background: white;
+    }
+
+    h1, h2, h3, h4 {
+        color: black;
+    }
+
+    /* Ensure content uses full width */
+    .content-wrapper {
+        display: block;
+    }
+
+    .main-content {
+        max-width: 100%;
+    }
+
+    .page-container {
+        max-width: 100%;
+        padding: 0;
+    }
+
+    /* Adjust boxes for print */
+    .definition-box,
+    .theorem-box,
+    .example-box,
+    .warning-box,
+    .note-box,
+    .exam-tip-box {
+        border: 1px solid #333;
+        background-color: white !important;
+        page-break-inside: avoid;
+    }
+
+    /* Ensure tables don't break across pages */
+    table {
+        page-break-inside: avoid;
+    }
+
+    th {
+        background-color: #ddd !important;
+        color: black !important;
+    }
+
+    /* SVG diagrams */
+    .diagram-container {
+        page-break-inside: avoid;
+    }
+
+    /* Links */
+    a {
+        color: black;
+        text-decoration: underline;
+    }
+
+    /* Hide hero section gradient effect */
+    .hero {
+        background-color: white !important;
+        color: black !important;
+        border-bottom: 2px solid black;
+    }
+
+    .hero h1 {
+        color: black !important;
+    }
+
+    /* Unit summary */
+    .unit-summary {
+        border: 2px solid black;
+    }
+
+    /* Page breaks */
+    h2 {
+        page-break-after: avoid;
+    }
+
+    .algorithm,
+    .formal-def {
+        page-break-inside: avoid;
+    }
+}

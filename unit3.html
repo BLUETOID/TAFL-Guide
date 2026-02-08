@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit III: Regular and Non-Regular Grammars - TAFL Study Guide</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="nav-header">
+        <nav class="nav-container">
+            <a href="index.html" class="nav-brand">TAFL Study Guide</a>
+            <div class="nav-links">
+                <a href="unit1.html">Unit I</a>
+                <a href="unit2.html">Unit II</a>
+                <a href="unit3.html" class="active">Unit III</a>
+                <a href="unit4.html">Unit IV</a>
+                <a href="unit5.html">Unit V</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="page-container">
+        <div class="content-wrapper">
+            <aside class="sidebar">
+                <nav class="sidebar-nav">
+                    <h3>Unit III Contents</h3>
+                    <ul>
+                        <li><a href="#cfg-intro">3.1 Context-Free Grammar</a></li>
+                        <li><a href="#derivations">3.2 Derivations</a></li>
+                        <li><a href="#parse-trees">3.3 Parse Trees</a></li>
+                        <li><a href="#ambiguity">3.4 Ambiguity in CFG</a></li>
+                        <li><a href="#regular-grammars">3.5 Regular Grammars</a></li>
+                        <li><a href="#fa-to-cfg">3.6 FA to CFG Conversion</a></li>
+                        <li><a href="#cfg-simplification">3.7 CFG Simplification</a></li>
+                        <li><a href="#cnf">3.8 Chomsky Normal Form</a></li>
+                        <li><a href="#gnf">3.9 Greibach Normal Form</a></li>
+                        <li><a href="#chomsky-hierarchy">3.10 Chomsky Hierarchy</a></li>
+                        <li><a href="#summary">Unit Summary</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <article class="main-content">
+                <h1>Unit III: Regular and Non-Regular Grammars</h1>
+
+                <!-- Section 3.1 -->
+                <section id="cfg-intro">
+                    <h2>3.1 Context-Free Grammar (CFG)</h2>
+
+                    <p>Context-Free Grammars are more powerful than regular expressions and can describe languages that require matching or nesting, such as balanced parentheses or programming language syntax.</p>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Context-Free Grammar</div>
+                        <p>A <strong>Context-Free Grammar (CFG)</strong> is a 4-tuple G = (V, T, P, S) where:</p>
+                        <ul>
+                            <li><code>V</code> = Finite set of <strong>variables</strong> (non-terminals), typically uppercase letters</li>
+                            <li><code>T</code> = Finite set of <strong>terminals</strong> (alphabet), typically lowercase letters</li>
+                            <li><code>P</code> = Finite set of <strong>productions</strong> (rules) of the form A -> alpha, where A in V and alpha in (V U T)*</li>
+                            <li><code>S in V</code> = <strong>Start symbol</strong></li>
+                        </ul>
+                        <p>V and T are disjoint: V intersection T = empty set.</p>
+                    </div>
+
+                    <p><strong>Why "Context-Free"?</strong> In a production A -> alpha, the variable A can be replaced by alpha regardless of its surrounding context (what symbols appear before or after A).</p>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: CFG for {a^n b^n : n >= 0}</div>
+                        <p>G = ({S}, {a, b}, P, S) where P:</p>
+                        <pre>
+S -> aSb
+S -> epsilon</pre>
+                        <p><strong>Derivation of aabb:</strong></p>
+                        <pre>
+S => aSb => aaSbb => aaepsilonbb => aabb</pre>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: CFG for Balanced Parentheses</div>
+                        <p>G = ({S}, {(, )}, P, S) where P:</p>
+                        <pre>
+S -> (S)
+S -> SS
+S -> epsilon</pre>
+                        <p><strong>Example strings:</strong> epsilon, (), (()), ()(), (())(), (()())</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: CFG for Simple Arithmetic Expressions</div>
+                        <p>G = ({E, T, F}, {+, *, (, ), id}, P, E) where P:</p>
+                        <pre>
+E -> E + T | T
+T -> T * F | F
+F -> (E) | id</pre>
+                        <p>This grammar encodes operator precedence: * binds tighter than +.</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: CFG for Palindromes over {a, b}</div>
+                        <p>L = {w : w = w^R} (strings that read same forwards and backwards)</p>
+                        <p>G = ({S}, {a, b}, P, S) where P:</p>
+                        <pre>
+S -> aSa
+S -> bSb
+S -> a
+S -> b
+S -> epsilon</pre>
+                        <p><strong>Derivation of "abba":</strong></p>
+                        <pre>
+S => aSa => abSba => abepsilonba => abba</pre>
+                        <p><strong>Example strings in L:</strong> epsilon, a, b, aa, bb, aba, bab, abba, abcba, ...</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: CFG for {a^m b^n : m >= n >= 0}</div>
+                        <p>This language has at least as many a's as b's, with a's coming first.</p>
+                        <p>G = ({S, A}, {a, b}, P, S) where P:</p>
+                        <pre>
+S -> aS | aAb | epsilon
+A -> aAb | epsilon</pre>
+                        <p><strong>Explanation:</strong></p>
+                        <ul>
+                            <li>S -> aS generates extra a's (more a's than b's)</li>
+                            <li>S -> aAb and A -> aAb generate matching a-b pairs</li>
+                            <li>The epsilon productions allow termination</li>
+                        </ul>
+                        <p><strong>Derivation of "aaab":</strong></p>
+                        <pre>
+S => aS => aaS => aaaAb => aaaepsilonb => aaab</pre>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: CFG for {a^i b^j c^k : i = j or j = k}</div>
+                        <p>This language requires EITHER the number of a's equals b's, OR number of b's equals c's.</p>
+                        <p>G = ({S, S1, S2, A, B}, {a, b, c}, P, S) where P:</p>
+                        <pre>
+S -> S1 | S2
+S1 -> AB           (handles i = j case)
+A -> aAb | epsilon
+B -> cB | epsilon
+S2 -> CD           (handles j = k case)
+C -> aC | epsilon
+D -> bDc | epsilon</pre>
+                        <p>This grammar is the union of two sub-grammars.</p>
+                    </div>
+
+                    <h3>Notation Conventions</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Symbol Type</th>
+                                <th>Convention</th>
+                                <th>Examples</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Variables (Non-terminals)</td>
+                                <td>Uppercase letters</td>
+                                <td>A, B, S, E, T</td>
+                            </tr>
+                            <tr>
+                                <td>Terminals</td>
+                                <td>Lowercase letters, digits, symbols</td>
+                                <td>a, b, 0, 1, +, *, (, )</td>
+                            </tr>
+                            <tr>
+                                <td>Strings of terminals</td>
+                                <td>Lowercase letters from end of alphabet</td>
+                                <td>w, x, y, z</td>
+                            </tr>
+                            <tr>
+                                <td>Strings of variables and terminals</td>
+                                <td>Greek letters</td>
+                                <td>alpha, beta, gamma</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- Section 3.2 -->
+                <section id="derivations">
+                    <h2>3.2 Derivations</h2>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Derivation</div>
+                        <p>A <strong>derivation</strong> is a sequence of steps that starts with the start symbol and ends with a string of terminals, where each step applies a production rule.</p>
+                        <ul>
+                            <li><code>alpha => beta</code>: beta is derived from alpha in one step</li>
+                            <li><code>alpha =>* beta</code>: beta is derived from alpha in zero or more steps</li>
+                            <li><code>alpha =>+ beta</code>: beta is derived from alpha in one or more steps</li>
+                        </ul>
+                    </div>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Sentential Form and Sentence</div>
+                        <ul>
+                            <li><strong>Sentential form:</strong> Any string alpha in (V U T)* such that S =>* alpha</li>
+                            <li><strong>Sentence:</strong> A sentential form with only terminals (no variables)</li>
+                        </ul>
+                    </div>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Language of a Grammar</div>
+                        <p>The language generated by grammar G is:</p>
+                        <p><code>L(G) = {w in T* : S =>* w}</code></p>
+                        <p>The set of all sentences derivable from the start symbol.</p>
+                    </div>
+
+                    <h3>Types of Derivations</h3>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Leftmost and Rightmost Derivations</div>
+                        <ul>
+                            <li><strong>Leftmost derivation:</strong> At each step, replace the leftmost variable</li>
+                            <li><strong>Rightmost derivation:</strong> At each step, replace the rightmost variable</li>
+                        </ul>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: Leftmost vs Rightmost Derivation</div>
+                        <p>Grammar: E -> E + E | E * E | (E) | id</p>
+                        <p>Derive: id + id * id</p>
+
+                        <p><strong>Leftmost derivation:</strong></p>
+                        <pre>
+E => E + E           (replace leftmost E)
+  => id + E          (replace leftmost E)
+  => id + E * E      (replace leftmost E)
+  => id + id * E     (replace leftmost E)
+  => id + id * id</pre>
+
+                        <p><strong>Rightmost derivation:</strong></p>
+                        <pre>
+E => E + E           (replace rightmost E)
+  => E + E * E       (replace rightmost E)
+  => E + E * id      (replace rightmost E)
+  => E + id * id     (replace rightmost E)
+  => id + id * id</pre>
+                    </div>
+
+                    <div class="note-box">
+                        <div class="box-title">Importance of Derivation Types</div>
+                        <ul>
+                            <li><strong>Leftmost:</strong> Used in top-down parsing (LL parsers)</li>
+                            <li><strong>Rightmost:</strong> Used in bottom-up parsing (LR parsers)</li>
+                            <li>A grammar is <strong>ambiguous</strong> if a string has multiple leftmost (or rightmost) derivations</li>
+                        </ul>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Solved Problem: Complete Derivation with Steps</div>
+                        <p>Given grammar G:</p>
+                        <pre>
+S -> aB | bA
+A -> a | aS | bAA
+B -> b | bS | aBB</pre>
+                        <p><strong>Problem:</strong> Derive the string "aabbab" using leftmost derivation.</p>
+                        <p><strong>Solution:</strong></p>
+                        <pre>
+S => aB                    (Rule: S -> aB)
+  => aaBB                  (Rule: B -> aBB)
+  => aabB                  (Rule: B -> b)
+  => aabbS                 (Rule: B -> bS)
+  => aabbaB                (Rule: S -> aB)
+  => aabbab                (Rule: B -> b)</pre>
+                        <p><strong>Verification:</strong> Each step replaces the leftmost variable only.</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Solved Problem: Finding All Derivations</div>
+                        <p>Grammar: S -> SS | a | b</p>
+                        <p><strong>Problem:</strong> Find all leftmost derivations of "aba".</p>
+                        <p><strong>Solution:</strong></p>
+                        <p><strong>Derivation 1:</strong></p>
+                        <pre>
+S => SS => aS => aSS => abS => aba</pre>
+                        <p><strong>Derivation 2:</strong></p>
+                        <pre>
+S => SS => SSS => aSS => abS => aba</pre>
+                        <p><strong>Derivation 3:</strong></p>
+                        <pre>
+S => SS => Sa => SSa => aSa => aba</pre>
+                        <p>Multiple leftmost derivations exist, so this grammar is <strong>ambiguous</strong>.</p>
+                    </div>
+                </section>
+
+                <!-- Section 3.3 -->
+                <section id="parse-trees">
+                    <h2>3.3 Parse Trees</h2>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Parse Tree (Derivation Tree)</div>
+                        <p>A <strong>parse tree</strong> for grammar G = (V, T, P, S) is a tree where:</p>
+                        <ul>
+                            <li>Root is labeled with the start symbol S</li>
+                            <li>Each internal node is labeled with a variable in V</li>
+                            <li>Each leaf is labeled with a terminal in T or epsilon</li>
+                            <li>If node A has children X1, X2, ..., Xn, then A -> X1 X2 ... Xn is a production in P</li>
+                        </ul>
+                        <p>The <strong>yield</strong> of the parse tree is the string of leaves read left to right.</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: Parse Tree for id + id * id</div>
+                        <p>Grammar: E -> E + E | E * E | id</p>
+
+                        <div class="diagram-container">
+                            <svg width="320" height="200" viewBox="0 0 320 200">
+                                <!-- Root E -->
+                                <circle cx="160" cy="25" r="15" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="160" y="30" text-anchor="middle" font-family="Georgia" font-size="14">E</text>
+
+                                <!-- Level 1: E + E -->
+                                <line x1="160" y1="40" x2="80" y2="70" stroke="#1a365d" stroke-width="1.5"/>
+                                <line x1="160" y1="40" x2="160" y2="70" stroke="#1a365d" stroke-width="1.5"/>
+                                <line x1="160" y1="40" x2="240" y2="70" stroke="#1a365d" stroke-width="1.5"/>
+
+                                <circle cx="80" cy="80" r="15" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="80" y="85" text-anchor="middle" font-family="Georgia" font-size="14">E</text>
+
+                                <text x="160" y="85" text-anchor="middle" font-family="monospace" font-size="14">+</text>
+
+                                <circle cx="240" cy="80" r="15" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="240" y="85" text-anchor="middle" font-family="Georgia" font-size="14">E</text>
+
+                                <!-- Left E -> id -->
+                                <line x1="80" y1="95" x2="80" y2="130" stroke="#1a365d" stroke-width="1.5"/>
+                                <text x="80" y="145" text-anchor="middle" font-family="monospace" font-size="12">id</text>
+
+                                <!-- Right E -> E * E -->
+                                <line x1="240" y1="95" x2="200" y2="125" stroke="#1a365d" stroke-width="1.5"/>
+                                <line x1="240" y1="95" x2="240" y2="125" stroke="#1a365d" stroke-width="1.5"/>
+                                <line x1="240" y1="95" x2="280" y2="125" stroke="#1a365d" stroke-width="1.5"/>
+
+                                <circle cx="200" cy="135" r="15" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="200" y="140" text-anchor="middle" font-family="Georgia" font-size="14">E</text>
+
+                                <text x="240" y="140" text-anchor="middle" font-family="monospace" font-size="14">*</text>
+
+                                <circle cx="280" cy="135" r="15" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="280" y="140" text-anchor="middle" font-family="Georgia" font-size="14">E</text>
+
+                                <!-- Bottom id's -->
+                                <line x1="200" y1="150" x2="200" y2="180" stroke="#1a365d" stroke-width="1.5"/>
+                                <text x="200" y="195" text-anchor="middle" font-family="monospace" font-size="12">id</text>
+
+                                <line x1="280" y1="150" x2="280" y2="180" stroke="#1a365d" stroke-width="1.5"/>
+                                <text x="280" y="195" text-anchor="middle" font-family="monospace" font-size="12">id</text>
+                            </svg>
+                            <p class="diagram-caption">Figure 3.1: Parse tree showing + evaluated before * (interpreting as (id + id) * id is WRONG for this tree)</p>
+                        </div>
+
+                        <p>This parse tree groups id + id first, then multiplies by id. It corresponds to (id + id) * id evaluation, which may not match intended semantics.</p>
+                    </div>
+
+                    <div class="theorem-box">
+                        <div class="box-title">Theorem: Parse Trees and Derivations</div>
+                        <p>For any CFG G and string w in L(G):</p>
+                        <ul>
+                            <li>There is a one-to-one correspondence between parse trees and leftmost derivations</li>
+                            <li>There is a one-to-one correspondence between parse trees and rightmost derivations</li>
+                        </ul>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: Parse Tree for a^2b^2</div>
+                        <p>Grammar: S -> aSb | epsilon</p>
+                        <p>String: aabb</p>
+
+                        <div class="diagram-container">
+                            <svg width="200" height="220" viewBox="0 0 200 220">
+                                <!-- Root S -->
+                                <circle cx="100" cy="25" r="18" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="100" y="31" text-anchor="middle" font-family="Georgia" font-size="14">S</text>
+
+                                <!-- Level 1: a S b -->
+                                <line x1="100" y1="43" x2="40" y2="75" stroke="#1a365d" stroke-width="1.5"/>
+                                <line x1="100" y1="43" x2="100" y2="75" stroke="#1a365d" stroke-width="1.5"/>
+                                <line x1="100" y1="43" x2="160" y2="75" stroke="#1a365d" stroke-width="1.5"/>
+
+                                <text x="40" y="95" text-anchor="middle" font-family="monospace" font-size="14">a</text>
+
+                                <circle cx="100" cy="90" r="18" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="100" y="96" text-anchor="middle" font-family="Georgia" font-size="14">S</text>
+
+                                <text x="160" y="95" text-anchor="middle" font-family="monospace" font-size="14">b</text>
+
+                                <!-- Level 2: a S b -->
+                                <line x1="100" y1="108" x2="60" y2="140" stroke="#1a365d" stroke-width="1.5"/>
+                                <line x1="100" y1="108" x2="100" y2="140" stroke="#1a365d" stroke-width="1.5"/>
+                                <line x1="100" y1="108" x2="140" y2="140" stroke="#1a365d" stroke-width="1.5"/>
+
+                                <text x="60" y="160" text-anchor="middle" font-family="monospace" font-size="14">a</text>
+
+                                <circle cx="100" cy="155" r="18" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="100" y="161" text-anchor="middle" font-family="Georgia" font-size="14">S</text>
+
+                                <text x="140" y="160" text-anchor="middle" font-family="monospace" font-size="14">b</text>
+
+                                <!-- Level 3: epsilon -->
+                                <line x1="100" y1="173" x2="100" y2="195" stroke="#1a365d" stroke-width="1.5"/>
+                                <text x="100" y="212" text-anchor="middle" font-family="Georgia" font-size="12" font-style="italic">e</text>
+                            </svg>
+                            <p class="diagram-caption">Figure 3.2: Parse tree for "aabb" using S -> aSb | epsilon</p>
+                        </div>
+
+                        <p><strong>Reading the yield:</strong> Left to right across leaves: a, a, epsilon, b, b = aabb</p>
+                        <p><strong>Corresponding derivation:</strong> S => aSb => aaSbb => aaepsilonbb => aabb</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Solved Problem: Construct Parse Tree from Derivation</div>
+                        <p>Grammar:</p>
+                        <pre>
+E -> E + T | T
+T -> T * F | F
+F -> id</pre>
+                        <p><strong>Problem:</strong> Construct the parse tree for id + id * id</p>
+                        <p><strong>Solution:</strong></p>
+                        <p>First, find the leftmost derivation:</p>
+                        <pre>
+E => E + T           (E -> E + T)
+  => T + T           (E -> T)
+  => F + T           (T -> F)
+  => id + T          (F -> id)
+  => id + T * F      (T -> T * F)
+  => id + F * F      (T -> F)
+  => id + id * F     (F -> id)
+  => id + id * id    (F -> id)</pre>
+
+                        <div class="diagram-container">
+                            <svg width="380" height="280" viewBox="0 0 380 280">
+                                <!-- Root E -->
+                                <circle cx="190" cy="20" r="16" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="190" y="25" text-anchor="middle" font-family="Georgia" font-size="13">E</text>
+
+                                <!-- Level 1: E + T -->
+                                <line x1="190" y1="36" x2="80" y2="60" stroke="#1a365d" stroke-width="1.5"/>
+                                <line x1="190" y1="36" x2="190" y2="60" stroke="#1a365d" stroke-width="1.5"/>
+                                <line x1="190" y1="36" x2="300" y2="60" stroke="#1a365d" stroke-width="1.5"/>
+
+                                <circle cx="80" cy="75" r="16" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="80" y="80" text-anchor="middle" font-family="Georgia" font-size="13">E</text>
+
+                                <text x="190" y="80" text-anchor="middle" font-family="monospace" font-size="14">+</text>
+
+                                <circle cx="300" cy="75" r="16" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="300" y="80" text-anchor="middle" font-family="Georgia" font-size="13">T</text>
+
+                                <!-- Left subtree: E -> T -> F -> id -->
+                                <line x1="80" y1="91" x2="80" y2="115" stroke="#1a365d" stroke-width="1.5"/>
+                                <circle cx="80" cy="130" r="16" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="80" y="135" text-anchor="middle" font-family="Georgia" font-size="13">T</text>
+
+                                <line x1="80" y1="146" x2="80" y2="170" stroke="#1a365d" stroke-width="1.5"/>
+                                <circle cx="80" cy="185" r="16" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="80" y="190" text-anchor="middle" font-family="Georgia" font-size="13">F</text>
+
+                                <line x1="80" y1="201" x2="80" y2="225" stroke="#1a365d" stroke-width="1.5"/>
+                                <text x="80" y="245" text-anchor="middle" font-family="monospace" font-size="12">id</text>
+
+                                <!-- Right subtree: T -> T * F -->
+                                <line x1="300" y1="91" x2="250" y2="120" stroke="#1a365d" stroke-width="1.5"/>
+                                <line x1="300" y1="91" x2="300" y2="120" stroke="#1a365d" stroke-width="1.5"/>
+                                <line x1="300" y1="91" x2="350" y2="120" stroke="#1a365d" stroke-width="1.5"/>
+
+                                <circle cx="250" cy="135" r="16" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="250" y="140" text-anchor="middle" font-family="Georgia" font-size="13">T</text>
+
+                                <text x="300" y="140" text-anchor="middle" font-family="monospace" font-size="14">*</text>
+
+                                <circle cx="350" cy="135" r="16" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="350" y="140" text-anchor="middle" font-family="Georgia" font-size="13">F</text>
+
+                                <!-- T -> F -> id -->
+                                <line x1="250" y1="151" x2="250" y2="175" stroke="#1a365d" stroke-width="1.5"/>
+                                <circle cx="250" cy="190" r="16" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="250" y="195" text-anchor="middle" font-family="Georgia" font-size="13">F</text>
+
+                                <line x1="250" y1="206" x2="250" y2="230" stroke="#1a365d" stroke-width="1.5"/>
+                                <text x="250" y="250" text-anchor="middle" font-family="monospace" font-size="12">id</text>
+
+                                <!-- F -> id -->
+                                <line x1="350" y1="151" x2="350" y2="175" stroke="#1a365d" stroke-width="1.5"/>
+                                <text x="350" y="195" text-anchor="middle" font-family="monospace" font-size="12">id</text>
+                            </svg>
+                            <p class="diagram-caption">Figure 3.3: Parse tree for id + id * id (correct precedence: * binds tighter)</p>
+                        </div>
+
+                        <p><strong>Interpretation:</strong> The tree structure shows that * is evaluated before +, giving id + (id * id).</p>
+                    </div>
+                </section>
+
+                <!-- Section 3.4 -->
+                <section id="ambiguity">
+                    <h2>3.4 Ambiguity in CFG</h2>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Ambiguous Grammar</div>
+                        <p>A CFG G is <strong>ambiguous</strong> if there exists a string w in L(G) that has:</p>
+                        <ul>
+                            <li>More than one leftmost derivation, OR</li>
+                            <li>More than one rightmost derivation, OR</li>
+                            <li>More than one parse tree</li>
+                        </ul>
+                        <p>(These three conditions are equivalent.)</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: Ambiguous Grammar</div>
+                        <p>Grammar: E -> E + E | E * E | id</p>
+                        <p>String: id + id * id has TWO parse trees:</p>
+
+                        <div class="diagram-container">
+                            <svg width="550" height="180" viewBox="0 0 550 180">
+                                <!-- Tree 1: (id + id) * id -->
+                                <text x="100" y="15" text-anchor="middle" font-family="Georgia" font-size="11">Tree 1: + at root</text>
+
+                                <circle cx="100" cy="35" r="12" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="100" y="40" text-anchor="middle" font-family="Georgia" font-size="12">E</text>
+
+                                <line x1="100" y1="47" x2="60" y2="70" stroke="#1a365d" stroke-width="1.5"/>
+                                <line x1="100" y1="47" x2="100" y2="70" stroke="#1a365d" stroke-width="1.5"/>
+                                <line x1="100" y1="47" x2="140" y2="70" stroke="#1a365d" stroke-width="1.5"/>
+
+                                <circle cx="60" cy="82" r="12" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="60" y="87" text-anchor="middle" font-family="Georgia" font-size="12">E</text>
+                                <text x="100" y="87" text-anchor="middle" font-family="monospace" font-size="12">+</text>
+                                <circle cx="140" cy="82" r="12" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="140" y="87" text-anchor="middle" font-family="Georgia" font-size="12">E</text>
+
+                                <line x1="60" y1="94" x2="60" y2="115" stroke="#1a365d" stroke-width="1.5"/>
+                                <text x="60" y="130" text-anchor="middle" font-family="monospace" font-size="10">id</text>
+
+                                <line x1="140" y1="94" x2="115" y2="117" stroke="#1a365d" stroke-width="1.5"/>
+                                <line x1="140" y1="94" x2="140" y2="117" stroke="#1a365d" stroke-width="1.5"/>
+                                <line x1="140" y1="94" x2="165" y2="117" stroke="#1a365d" stroke-width="1.5"/>
+
+                                <circle cx="115" cy="127" r="10" fill="white" stroke="#1a365d" stroke-width="1.5"/>
+                                <text x="115" y="131" text-anchor="middle" font-family="Georgia" font-size="10">E</text>
+                                <text x="140" y="131" text-anchor="middle" font-family="monospace" font-size="10">*</text>
+                                <circle cx="165" cy="127" r="10" fill="white" stroke="#1a365d" stroke-width="1.5"/>
+                                <text x="165" y="131" text-anchor="middle" font-family="Georgia" font-size="10">E</text>
+
+                                <line x1="115" y1="137" x2="115" y2="155" stroke="#1a365d" stroke-width="1"/>
+                                <text x="115" y="168" text-anchor="middle" font-family="monospace" font-size="10">id</text>
+                                <line x1="165" y1="137" x2="165" y2="155" stroke="#1a365d" stroke-width="1"/>
+                                <text x="165" y="168" text-anchor="middle" font-family="monospace" font-size="10">id</text>
+
+                                <!-- Arrow between trees -->
+                                <text x="275" y="100" text-anchor="middle" font-family="Georgia" font-size="16">vs</text>
+
+                                <!-- Tree 2: id + (id * id) -->
+                                <text x="430" y="15" text-anchor="middle" font-family="Georgia" font-size="11">Tree 2: * at root</text>
+
+                                <circle cx="430" cy="35" r="12" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="430" y="40" text-anchor="middle" font-family="Georgia" font-size="12">E</text>
+
+                                <line x1="430" y1="47" x2="390" y2="70" stroke="#1a365d" stroke-width="1.5"/>
+                                <line x1="430" y1="47" x2="430" y2="70" stroke="#1a365d" stroke-width="1.5"/>
+                                <line x1="430" y1="47" x2="470" y2="70" stroke="#1a365d" stroke-width="1.5"/>
+
+                                <circle cx="390" cy="82" r="12" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="390" y="87" text-anchor="middle" font-family="Georgia" font-size="12">E</text>
+                                <text x="430" y="87" text-anchor="middle" font-family="monospace" font-size="12">*</text>
+                                <circle cx="470" cy="82" r="12" fill="white" stroke="#1a365d" stroke-width="2"/>
+                                <text x="470" y="87" text-anchor="middle" font-family="Georgia" font-size="12">E</text>
+
+                                <line x1="470" y1="94" x2="470" y2="115" stroke="#1a365d" stroke-width="1.5"/>
+                                <text x="470" y="130" text-anchor="middle" font-family="monospace" font-size="10">id</text>
+
+                                <line x1="390" y1="94" x2="365" y2="117" stroke="#1a365d" stroke-width="1.5"/>
+                                <line x1="390" y1="94" x2="390" y2="117" stroke="#1a365d" stroke-width="1.5"/>
+                                <line x1="390" y1="94" x2="415" y2="117" stroke="#1a365d" stroke-width="1.5"/>
+
+                                <circle cx="365" cy="127" r="10" fill="white" stroke="#1a365d" stroke-width="1.5"/>
+                                <text x="365" y="131" text-anchor="middle" font-family="Georgia" font-size="10">E</text>
+                                <text x="390" y="131" text-anchor="middle" font-family="monospace" font-size="10">+</text>
+                                <circle cx="415" cy="127" r="10" fill="white" stroke="#1a365d" stroke-width="1.5"/>
+                                <text x="415" y="131" text-anchor="middle" font-family="Georgia" font-size="10">E</text>
+
+                                <line x1="365" y1="137" x2="365" y2="155" stroke="#1a365d" stroke-width="1"/>
+                                <text x="365" y="168" text-anchor="middle" font-family="monospace" font-size="10">id</text>
+                                <line x1="415" y1="137" x2="415" y2="155" stroke="#1a365d" stroke-width="1"/>
+                                <text x="415" y="168" text-anchor="middle" font-family="monospace" font-size="10">id</text>
+                            </svg>
+                            <p class="diagram-caption">Figure 3.2: Two parse trees for "id + id * id" showing ambiguity</p>
+                        </div>
+
+                        <p>Tree 1 interprets as id + (id * id), Tree 2 as (id + id) * id - different semantics!</p>
+                    </div>
+
+                    <h3>Removing Ambiguity</h3>
+                    <p>Techniques to make a grammar unambiguous:</p>
+                    <ol>
+                        <li><strong>Precedence:</strong> Use multiple variables to encode operator precedence</li>
+                        <li><strong>Associativity:</strong> Use left-recursion for left-associativity, right-recursion for right</li>
+                        <li><strong>Dangling else:</strong> Match else with nearest unmatched if</li>
+                    </ol>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: Unambiguous Expression Grammar</div>
+                        <p>Unambiguous grammar with * having higher precedence than +:</p>
+                        <pre>
+E -> E + T | T       (E handles +, left-associative)
+T -> T * F | F       (T handles *, left-associative)
+F -> (E) | id        (F handles atoms)</pre>
+                        <p>Now "id + id * id" has only ONE parse tree (the correct one with * binding tighter).</p>
+                    </div>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Inherently Ambiguous Language</div>
+                        <p>A CFL L is <strong>inherently ambiguous</strong> if every CFG for L is ambiguous.</p>
+                        <p>Example: L = {a^n b^n c^m : n, m >= 1} U {a^n b^m c^m : n, m >= 1}</p>
+                    </div>
+
+                    <div class="warning-box">
+                        <div class="box-title">Common Mistake</div>
+                        <p>Ambiguity is a property of GRAMMARS, not languages. Most languages have both ambiguous and unambiguous grammars. Only inherently ambiguous languages have no unambiguous grammar.</p>
+                    </div>
+                </section>
+
+                <!-- Section 3.5 -->
+                <section id="regular-grammars">
+                    <h2>3.5 Regular Grammars</h2>
+
+                    <p>Regular grammars are a restricted form of CFG that generate exactly the regular languages.</p>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Right-Linear Grammar</div>
+                        <p>A CFG is <strong>right-linear</strong> if every production has one of these forms:</p>
+                        <ul>
+                            <li>A -> wB (terminal string followed by single variable)</li>
+                            <li>A -> w (terminal string only)</li>
+                        </ul>
+                        <p>where w in T* and A, B in V.</p>
+                    </div>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Left-Linear Grammar</div>
+                        <p>A CFG is <strong>left-linear</strong> if every production has one of these forms:</p>
+                        <ul>
+                            <li>A -> Bw (single variable followed by terminal string)</li>
+                            <li>A -> w (terminal string only)</li>
+                        </ul>
+                    </div>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Regular Grammar</div>
+                        <p>A <strong>regular grammar</strong> is either entirely right-linear OR entirely left-linear.</p>
+                        <p><strong>Important:</strong> Mixing left-linear and right-linear productions in the same grammar does NOT necessarily give a regular language!</p>
+                    </div>
+
+                    <div class="theorem-box">
+                        <div class="box-title">Theorem: Regular Grammar Equivalence</div>
+                        <p>A language is regular if and only if it can be generated by a regular grammar.</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: Right-Linear Grammar</div>
+                        <p>Right-linear grammar for L = {w in {a,b}* : w ends with ab}:</p>
+                        <pre>
+S -> aS | bS | aB
+B -> b</pre>
+                        <p>Or equivalently:</p>
+                        <pre>
+S -> aS | bS | ab</pre>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: Left-Linear Grammar</div>
+                        <p>Left-linear grammar for L = {w in {a,b}* : w starts with ab}:</p>
+                        <pre>
+S -> Sa | Sb | B
+B -> ab</pre>
+                        <p>Or: S -> Sa | Sb | ab</p>
+                    </div>
+                </section>
+
+                <!-- Section 3.6 -->
+                <section id="fa-to-cfg">
+                    <h2>3.6 Conversions: FA to CFG and Regular Grammar to FA</h2>
+
+                    <h3>DFA/NFA to Right-Linear Grammar</h3>
+                    <div class="algorithm">
+                        <div class="algorithm-title">Algorithm: FA to Right-Linear Grammar</div>
+                        <p>Given DFA M = (Q, Sigma, delta, q0, F):</p>
+                        <ol>
+                            <li>Create a variable A_q for each state q in Q</li>
+                            <li>For each transition delta(p, a) = q, add production: A_p -> aA_q</li>
+                            <li>For each final state q in F, add production: A_q -> epsilon</li>
+                            <li>Start symbol is A_q0</li>
+                        </ol>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: DFA to Grammar</div>
+                        <p>DFA for strings ending with "1":</p>
+                        <table class="transition-table">
+                            <thead><tr><th>State</th><th>0</th><th>1</th></tr></thead>
+                            <tbody>
+                                <tr><td class="state-initial">q0</td><td>q0</td><td>q1</td></tr>
+                                <tr><td class="state-final">q1</td><td>q0</td><td>q1</td></tr>
+                            </tbody>
+                        </table>
+
+                        <p><strong>Resulting Grammar:</strong></p>
+                        <pre>
+A0 -> 0A0 | 1A1
+A1 -> 0A0 | 1A1 | epsilon
+
+Simplified (A0 = S, A1 = B):
+S -> 0S | 1B
+B -> 0S | 1B | epsilon</pre>
+                    </div>
+
+                    <h3>Right-Linear Grammar to NFA</h3>
+                    <div class="algorithm">
+                        <div class="algorithm-title">Algorithm: Right-Linear Grammar to NFA</div>
+                        <p>Given right-linear grammar G = (V, T, P, S):</p>
+                        <ol>
+                            <li>Create a state q_A for each variable A in V</li>
+                            <li>Create one additional final state q_f</li>
+                            <li>For production A -> aB, add transition delta(q_A, a) includes q_B</li>
+                            <li>For production A -> a, add transition delta(q_A, a) includes q_f</li>
+                            <li>For production A -> epsilon, add delta(q_A, epsilon) includes q_f</li>
+                            <li>Start state is q_S</li>
+                        </ol>
+                    </div>
+
+                    <div class="exam-tip-box">
+                        <div class="box-title">Exam Tip</div>
+                        <p>When converting between FA and grammar:</p>
+                        <ul>
+                            <li>States become variables, transitions become productions</li>
+                            <li>Final states correspond to epsilon productions</li>
+                            <li>The direction of the conversion determines right-linear vs left-linear</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Section 3.7 -->
+                <section id="cfg-simplification">
+                    <h2>3.7 CFG Simplification</h2>
+
+                    <p>Before converting to normal forms, CFGs should be simplified by removing useless elements.</p>
+
+                    <h3>Types of Useless Symbols</h3>
+                    <div class="definition-box">
+                        <div class="box-title">Definitions</div>
+                        <ul>
+                            <li><strong>Generating symbol:</strong> A variable A is generating if A =>* w for some w in T*</li>
+                            <li><strong>Reachable symbol:</strong> A symbol X is reachable if S =>* alpha X beta for some alpha, beta</li>
+                            <li><strong>Useful symbol:</strong> A symbol that is both generating and reachable</li>
+                            <li><strong>Useless symbol:</strong> A symbol that is not useful</li>
+                        </ul>
+                    </div>
+
+                    <h3>Simplification Steps</h3>
+                    <div class="algorithm">
+                        <div class="algorithm-title">Algorithm: CFG Simplification</div>
+                        <p>To simplify CFG G = (V, T, P, S), perform these steps IN ORDER:</p>
+                        <ol>
+                            <li><strong>Remove non-generating symbols:</strong>
+                                <ul>
+                                    <li>Find all generating variables (can derive terminal string)</li>
+                                    <li>Remove productions containing non-generating variables</li>
+                                </ul>
+                            </li>
+                            <li><strong>Remove non-reachable symbols:</strong>
+                                <ul>
+                                    <li>Find all symbols reachable from S</li>
+                                    <li>Remove productions containing non-reachable symbols</li>
+                                </ul>
+                            </li>
+                        </ol>
+                        <p><strong>Important:</strong> Order matters! Do generating first, then reachable.</p>
+                    </div>
+
+                    <h3>Eliminating Epsilon Productions</h3>
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Nullable Variable</div>
+                        <p>A variable A is <strong>nullable</strong> if A =>* epsilon.</p>
+                    </div>
+
+                    <div class="algorithm">
+                        <div class="algorithm-title">Algorithm: Eliminating Epsilon Productions</div>
+                        <ol>
+                            <li>Find all nullable variables</li>
+                            <li>For each production A -> X1X2...Xn, create all versions where nullable Xi's are optionally omitted</li>
+                            <li>Remove all A -> epsilon productions (except S -> epsilon if epsilon in L)</li>
+                        </ol>
+                    </div>
+
+                    <h3>Eliminating Unit Productions</h3>
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Unit Production</div>
+                        <p>A <strong>unit production</strong> is of the form A -> B where both A and B are variables.</p>
+                    </div>
+
+                    <div class="algorithm">
+                        <div class="algorithm-title">Algorithm: Eliminating Unit Productions</div>
+                        <ol>
+                            <li>For each variable A, find all B such that A =>* B using only unit productions</li>
+                            <li>For each non-unit production B -> alpha, add A -> alpha</li>
+                            <li>Remove all unit productions</li>
+                        </ol>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: CFG Simplification</div>
+                        <p>Simplify the grammar:</p>
+                        <pre>
+S -> AB | a
+A -> a
+B -> C | b
+C -> D
+D -> E
+E -> a</pre>
+
+                        <p><strong>Step 1: Find generating variables</strong></p>
+                        <p>A -> a (generates a), so A is generating</p>
+                        <p>E -> a (generates a), so E is generating</p>
+                        <p>D -> E and E generating, so D is generating</p>
+                        <p>C -> D and D generating, so C is generating</p>
+                        <p>B -> b and B -> C, so B is generating</p>
+                        <p>S -> a and S -> AB, so S is generating</p>
+                        <p>All variables are generating.</p>
+
+                        <p><strong>Step 2: Find reachable symbols</strong></p>
+                        <p>From S: A, B reachable (S -> AB)</p>
+                        <p>From A: a reachable</p>
+                        <p>From B: C, b reachable</p>
+                        <p>From C: D reachable</p>
+                        <p>From D: E reachable</p>
+                        <p>From E: a reachable</p>
+                        <p>All symbols are reachable.</p>
+
+                        <p><strong>Step 3: Eliminate unit productions</strong></p>
+                        <p>Unit chains: B -> C -> D -> E</p>
+                        <p>E -> a, so add: D -> a, C -> a, B -> a</p>
+                        <p>Result: S -> AB | a, A -> a, B -> a | b</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Solved Problem: Complete CFG Simplification (Step by Step)</div>
+                        <p><strong>Problem:</strong> Simplify the following grammar completely:</p>
+                        <pre>
+S -> aAB | bBC
+A -> aA | a
+B -> bB | epsilon
+C -> cC
+D -> dD | d</pre>
+
+                        <p><strong>Solution:</strong></p>
+
+                        <p><strong>Step 1: Identify Generating Variables</strong></p>
+                        <table>
+                            <thead><tr><th>Pass</th><th>Generating Set</th><th>Reason</th></tr></thead>
+                            <tbody>
+                                <tr><td>1</td><td>{A}</td><td>A -> a (terminal production)</td></tr>
+                                <tr><td>1</td><td>{A, B}</td><td>B -> epsilon (generates empty string)</td></tr>
+                                <tr><td>1</td><td>{A, B, D}</td><td>D -> d (terminal production)</td></tr>
+                                <tr><td>2</td><td>{A, B, D, S}</td><td>S -> aAB (all of A, B are generating)</td></tr>
+                            </tbody>
+                        </table>
+                        <p><strong>C is NOT generating</strong> (C -> cC only - never reaches a terminal)</p>
+                        <p>Remove productions containing C:</p>
+                        <pre>
+S -> aAB
+A -> aA | a
+B -> bB | epsilon
+D -> dD | d</pre>
+
+                        <p><strong>Step 2: Identify Reachable Symbols</strong></p>
+                        <table>
+                            <thead><tr><th>Pass</th><th>Reachable Set</th><th>Reason</th></tr></thead>
+                            <tbody>
+                                <tr><td>0</td><td>{S}</td><td>Start symbol</td></tr>
+                                <tr><td>1</td><td>{S, A, B, a}</td><td>From S -> aAB</td></tr>
+                                <tr><td>2</td><td>{S, A, B, a, b}</td><td>From A -> aA, B -> bB</td></tr>
+                            </tbody>
+                        </table>
+                        <p><strong>D is NOT reachable</strong> from S</p>
+                        <p>Remove productions containing D:</p>
+                        <pre>
+S -> aAB
+A -> aA | a
+B -> bB | epsilon</pre>
+
+                        <p><strong>Step 3: Eliminate Epsilon Productions</strong></p>
+                        <p>Nullable variables: B (because B -> epsilon)</p>
+                        <p>For each production containing B, create versions with B present and absent:</p>
+                        <ul>
+                            <li>S -> aAB becomes S -> aAB | aA</li>
+                            <li>B -> bB becomes B -> bB | b</li>
+                        </ul>
+                        <p>Remove B -> epsilon:</p>
+                        <pre>
+S -> aAB | aA
+A -> aA | a
+B -> bB | b</pre>
+
+                        <p><strong>Step 4: Eliminate Unit Productions</strong></p>
+                        <p>No unit productions in this grammar.</p>
+
+                        <p><strong>Final Simplified Grammar:</strong></p>
+                        <pre>
+S -> aAB | aA
+A -> aA | a
+B -> bB | b</pre>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Solved Problem: Eliminating Epsilon Productions</div>
+                        <p><strong>Problem:</strong> Eliminate epsilon productions from:</p>
+                        <pre>
+S -> ABaC
+A -> BC
+B -> b | epsilon
+C -> c | epsilon</pre>
+
+                        <p><strong>Solution:</strong></p>
+                        <p><strong>Step 1:</strong> Find all nullable variables</p>
+                        <ul>
+                            <li>B is nullable (B -> epsilon)</li>
+                            <li>C is nullable (C -> epsilon)</li>
+                            <li>A is nullable (A -> BC and both B, C are nullable)</li>
+                            <li>S is NOT nullable (S -> ABaC contains 'a' which is not nullable)</li>
+                        </ul>
+
+                        <p><strong>Step 2:</strong> Create new productions by considering all combinations of nullable variables:</p>
+                        <p>For S -> ABaC (A, B, C are nullable):</p>
+                        <ul>
+                            <li>All present: S -> ABaC</li>
+                            <li>A absent: S -> BaC</li>
+                            <li>B absent: S -> AaC</li>
+                            <li>C absent: S -> ABa</li>
+                            <li>A, B absent: S -> aC</li>
+                            <li>A, C absent: S -> Ba</li>
+                            <li>B, C absent: S -> Aa</li>
+                            <li>A, B, C absent: S -> a</li>
+                        </ul>
+
+                        <p>For A -> BC (both nullable):</p>
+                        <ul>
+                            <li>A -> BC | B | C</li>
+                        </ul>
+
+                        <p>For B -> b | epsilon: Keep only B -> b</p>
+                        <p>For C -> c | epsilon: Keep only C -> c</p>
+
+                        <p><strong>Final Grammar:</strong></p>
+                        <pre>
+S -> ABaC | BaC | AaC | ABa | aC | Ba | Aa | a
+A -> BC | B | C
+B -> b
+C -> c</pre>
+                    </div>
+                </section>
+
+                <!-- Section 3.8 -->
+                <section id="cnf">
+                    <h2>3.8 Chomsky Normal Form (CNF)</h2>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Chomsky Normal Form</div>
+                        <p>A CFG is in <strong>Chomsky Normal Form (CNF)</strong> if every production is of the form:</p>
+                        <ul>
+                            <li>A -> BC (two variables)</li>
+                            <li>A -> a (single terminal)</li>
+                            <li>S -> epsilon (only if epsilon is in L, and S doesn't appear on right side)</li>
+                        </ul>
+                    </div>
+
+                    <div class="theorem-box">
+                        <div class="box-title">Theorem: CNF Existence</div>
+                        <p>Every context-free language without epsilon can be generated by a grammar in CNF. If epsilon is in L, we can have S -> epsilon as an additional production (with S not appearing on any right side).</p>
+                    </div>
+
+                    <h3>Conversion to CNF</h3>
+                    <div class="algorithm">
+                        <div class="algorithm-title">Algorithm: Conversion to CNF</div>
+                        <p>Given simplified CFG G (no useless symbols, epsilon-productions, or unit productions):</p>
+                        <ol>
+                            <li><strong>Handle terminals in long productions:</strong>
+                                <br>For each terminal a appearing in a production with length > 1:
+                                <ul>
+                                    <li>Create new variable C_a</li>
+                                    <li>Add production C_a -> a</li>
+                                    <li>Replace a with C_a in all productions of length > 1</li>
+                                </ul>
+                            </li>
+                            <li><strong>Break long productions:</strong>
+                                <br>For each production A -> B1B2...Bk (k > 2):
+                                <ul>
+                                    <li>Replace with: A -> B1D1, D1 -> B2D2, ..., Dk-2 -> Bk-1Bk</li>
+                                    <li>Use new variables D1, D2, etc.</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: Conversion to CNF</div>
+                        <p>Convert to CNF:</p>
+                        <pre>
+S -> bA | aB
+A -> bAA | aS | a
+B -> aBB | bS | b</pre>
+
+                        <p><strong>Step 1: Replace terminals in long productions</strong></p>
+                        <p>Create Ca -> a, Cb -> b</p>
+                        <pre>
+S -> CbA | CaB
+A -> CbAA | CaS | a
+B -> CaBB | CbS | b
+Ca -> a
+Cb -> b</pre>
+
+                        <p><strong>Step 2: Break long productions</strong></p>
+                        <p>A -> CbAA becomes A -> CbD1, D1 -> AA</p>
+                        <p>B -> CaBB becomes B -> CaD2, D2 -> BB</p>
+
+                        <p><strong>Final CNF:</strong></p>
+                        <pre>
+S -> CbA | CaB
+A -> CbD1 | CaS | a
+B -> CaD2 | CbS | b
+D1 -> AA
+D2 -> BB
+Ca -> a
+Cb -> b</pre>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Solved Problem: Complete CNF Conversion</div>
+                        <p><strong>Problem:</strong> Convert the following grammar to Chomsky Normal Form:</p>
+                        <pre>
+S -> aAB | BA
+A -> BBB | a
+B -> AS | b</pre>
+
+                        <p><strong>Solution:</strong></p>
+
+                        <p><strong>Step 1: Check for useless symbols, epsilon, and unit productions</strong></p>
+                        <p>This grammar has no epsilon productions, no unit productions, and all symbols are useful. We can proceed directly to CNF conversion.</p>
+
+                        <p><strong>Step 2: Replace terminals in long productions</strong></p>
+                        <p>Create new variables for terminals appearing in productions with length > 1:</p>
+                        <ul>
+                            <li>Ca -> a (for terminal 'a')</li>
+                        </ul>
+                        <p>Replace terminals in long productions:</p>
+                        <pre>
+S -> CaAB | BA
+A -> BBB | a
+B -> AS | b
+Ca -> a</pre>
+
+                        <p><strong>Step 3: Break productions with more than 2 symbols</strong></p>
+                        <p>S -> CaAB has 3 symbols. Create D1:</p>
+                        <ul>
+                            <li>S -> CaD1 where D1 -> AB</li>
+                        </ul>
+                        <p>A -> BBB has 3 symbols. Create D2:</p>
+                        <ul>
+                            <li>A -> BD2 where D2 -> BB</li>
+                        </ul>
+
+                        <p><strong>Final CNF Grammar:</strong></p>
+                        <pre>
+S -> CaD1 | BA
+A -> BD2 | a
+B -> AS | b
+D1 -> AB
+D2 -> BB
+Ca -> a</pre>
+
+                        <p><strong>Verification:</strong> Every production is either A -> BC (two variables) or A -> a (single terminal).</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Solved Problem: CNF with Epsilon Elimination First</div>
+                        <p><strong>Problem:</strong> Convert to CNF:</p>
+                        <pre>
+S -> AB
+A -> aA | epsilon
+B -> bB | epsilon</pre>
+
+                        <p><strong>Solution:</strong></p>
+
+                        <p><strong>Step 1: Find nullable variables</strong></p>
+                        <ul>
+                            <li>A is nullable (A -> epsilon)</li>
+                            <li>B is nullable (B -> epsilon)</li>
+                            <li>S is nullable (S -> AB and both A, B are nullable)</li>
+                        </ul>
+
+                        <p><strong>Step 2: Eliminate epsilon productions</strong></p>
+                        <p>For S -> AB:</p>
+                        <ul>
+                            <li>S -> AB | A | B (but not epsilon since we handle that separately)</li>
+                        </ul>
+                        <p>For A -> aA:</p>
+                        <ul>
+                            <li>A -> aA | a</li>
+                        </ul>
+                        <p>For B -> bB:</p>
+                        <ul>
+                            <li>B -> bB | b</li>
+                        </ul>
+                        <p>Since S is nullable and epsilon should be in L, add S' -> S | epsilon with S' as new start:</p>
+                        <pre>
+S' -> S | epsilon
+S -> AB | A | B
+A -> aA | a
+B -> bB | b</pre>
+
+                        <p><strong>Step 3: Eliminate unit productions</strong></p>
+                        <p>S -> A and S -> B are unit productions.</p>
+                        <p>Replace with non-unit productions of A and B:</p>
+                        <pre>
+S' -> S | epsilon
+S -> AB | aA | a | bB | b
+A -> aA | a
+B -> bB | b</pre>
+
+                        <p><strong>Step 4: Convert to CNF</strong></p>
+                        <p>Replace terminals in long productions:</p>
+                        <pre>
+S' -> S | epsilon
+S -> AB | CaA | a | CbB | b
+A -> CaA | a
+B -> CbB | b
+Ca -> a
+Cb -> b</pre>
+
+                        <p>All productions are now in CNF form.</p>
+                    </div>
+
+                    <div class="note-box">
+                        <div class="box-title">Applications of CNF</div>
+                        <ul>
+                            <li><strong>CYK Parsing Algorithm:</strong> Requires CNF, runs in O(n^3) time</li>
+                            <li><strong>Proving properties:</strong> Parse tree structure is simplified</li>
+                            <li><strong>Pumping lemma proofs:</strong> CNF makes tree height analysis easier</li>
+                        </ul>
+                    </div>
+
+                    <div class="exam-tip-box">
+                        <div class="box-title">CNF Conversion Checklist</div>
+                        <ol>
+                            <li>Eliminate epsilon productions (find nullable, create combinations)</li>
+                            <li>Eliminate unit productions (follow chains, copy non-unit productions)</li>
+                            <li>Remove useless symbols (generating first, then reachable)</li>
+                            <li>Replace terminals with new variables in productions of length >= 2</li>
+                            <li>Break productions with more than 2 symbols using new variables</li>
+                        </ol>
+                    </div>
+                </section>
+
+                <!-- Section 3.9 -->
+                <section id="gnf">
+                    <h2>3.9 Greibach Normal Form (GNF)</h2>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Greibach Normal Form</div>
+                        <p>A CFG is in <strong>Greibach Normal Form (GNF)</strong> if every production is of the form:</p>
+                        <ul>
+                            <li>A -> a alpha (terminal followed by zero or more variables)</li>
+                            <li>S -> epsilon (only if epsilon is in L)</li>
+                        </ul>
+                        <p>where a in T and alpha in V*.</p>
+                    </div>
+
+                    <div class="theorem-box">
+                        <div class="box-title">Theorem: GNF Existence</div>
+                        <p>Every context-free language can be generated by a grammar in GNF.</p>
+                    </div>
+
+                    <h3>Properties of GNF</h3>
+                    <ul>
+                        <li>Every derivation step consumes exactly one terminal</li>
+                        <li>Derivation of string of length n takes exactly n steps</li>
+                        <li>No left recursion (useful for LL parsing)</li>
+                        <li>Easier to convert to PDA</li>
+                    </ul>
+
+                    <div class="algorithm">
+                        <div class="algorithm-title">Algorithm: Conversion to GNF (Outline)</div>
+                        <ol>
+                            <li>Start with grammar in CNF</li>
+                            <li>Order variables A1, A2, ..., An</li>
+                            <li>Eliminate left recursion</li>
+                            <li>Ensure each production Ai -> alpha has alpha starting with terminal or Aj where j > i</li>
+                            <li>Substitute to make all productions start with terminals</li>
+                        </ol>
+                        <p>The full algorithm is complex; exam focus is usually on understanding the form rather than conversion.</p>
+                    </div>
+
+                    <h3>Left Recursion Elimination</h3>
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Left Recursion</div>
+                        <p>A production A -> A alpha is <strong>directly left recursive</strong>. Left recursion must be eliminated for GNF conversion.</p>
+                        <p><strong>Elimination technique:</strong> For productions A -> A alpha1 | A alpha2 | ... | beta1 | beta2 | ...</p>
+                        <p>Replace with:</p>
+                        <ul>
+                            <li>A -> beta1 A' | beta2 A' | ... | beta1 | beta2 | ...</li>
+                            <li>A' -> alpha1 A' | alpha2 A' | ... | alpha1 | alpha2 | ...</li>
+                        </ul>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: Left Recursion Elimination</div>
+                        <p><strong>Given:</strong> E -> E + T | T</p>
+                        <p><strong>Identify:</strong></p>
+                        <ul>
+                            <li>Left recursive: E -> E + T (alpha = +T)</li>
+                            <li>Non-left recursive: E -> T (beta = T)</li>
+                        </ul>
+                        <p><strong>After elimination:</strong></p>
+                        <pre>
+E -> TE'
+E' -> +TE' | epsilon</pre>
+                        <p>Now E is no longer left recursive.</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: Grammar in GNF</div>
+                        <p>GNF for {a^n b^n : n >= 1}:</p>
+                        <pre>
+S -> aSB | aB
+B -> b</pre>
+                        <p>Every production starts with a terminal followed by variables.</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Example: Simple GNF Conversion</div>
+                        <p><strong>Problem:</strong> Convert to GNF:</p>
+                        <pre>
+S -> AB
+A -> aA | a
+B -> bB | b</pre>
+
+                        <p><strong>Solution:</strong></p>
+                        <p><strong>Step 1:</strong> Check which productions already start with terminals</p>
+                        <ul>
+                            <li>A -> aA | a - Already in GNF form</li>
+                            <li>B -> bB | b - Already in GNF form</li>
+                            <li>S -> AB - Starts with variable A (needs substitution)</li>
+                        </ul>
+
+                        <p><strong>Step 2:</strong> Substitute A's productions into S -> AB</p>
+                        <p>S -> AB becomes S -> aAB | aB</p>
+
+                        <p><strong>Final GNF:</strong></p>
+                        <pre>
+S -> aAB | aB
+A -> aA | a
+B -> bB | b</pre>
+                        <p>All productions now start with a terminal.</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="box-title">Solved Problem: GNF for Balanced Parentheses</div>
+                        <p><strong>Problem:</strong> Convert to GNF:</p>
+                        <pre>
+S -> SS | (S) | epsilon</pre>
+
+                        <p><strong>Solution:</strong></p>
+                        <p>First, we need to handle epsilon and the left recursion S -> SS.</p>
+
+                        <p><strong>Step 1:</strong> Handle S -> SS (left recursive)</p>
+                        <p>Non-left-recursive alternatives: S -> (S) | epsilon</p>
+                        <p>After left recursion elimination:</p>
+                        <pre>
+S -> (S)S' | epsilon S' | (S) | epsilon
+S' -> SS' | S</pre>
+                        <p>Simplify (epsilon S' = S'):</p>
+                        <pre>
+S -> (S)S' | S' | (S) | epsilon
+S' -> SS' | S</pre>
+
+                        <p><strong>Step 2:</strong> This is getting complex. A simpler equivalent GNF:</p>
+                        <pre>
+S -> (S)S | (S) | () | epsilon</pre>
+                        <p>But for true GNF (no epsilon except possibly for S), we'd need:</p>
+                        <pre>
+S' -> S | epsilon
+S -> (SB | (B
+B -> )S | )</pre>
+                        <p>Where S' is the new start symbol.</p>
+                    </div>
+
+                    <div class="note-box">
+                        <div class="box-title">Applications of GNF</div>
+                        <ul>
+                            <li><strong>PDA Construction:</strong> GNF makes it easy to construct equivalent PDA</li>
+                            <li><strong>Parsing:</strong> Avoids left recursion, suitable for predictive parsing</li>
+                            <li><strong>Complexity Analysis:</strong> Exactly n steps for string of length n</li>
+                        </ul>
+                    </div>
+
+                    <div class="exam-tip-box">
+                        <div class="box-title">GNF Key Points</div>
+                        <ul>
+                            <li>Every production must start with a terminal (except S -> epsilon if needed)</li>
+                            <li>After the terminal, only variables can follow</li>
+                            <li>Left recursion must be eliminated before conversion</li>
+                            <li>GNF is useful for constructing PDAs from grammars</li>
+                            <li>Derivation of string of length n takes exactly n steps</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Section 3.10 -->
+                <section id="chomsky-hierarchy">
+                    <h2>3.10 Chomsky Hierarchy</h2>
+
+                    <p>The Chomsky hierarchy classifies formal grammars and languages into four types based on the form of production rules.</p>
+
+                    <div class="definition-box">
+                        <div class="box-title">Definition: Chomsky Hierarchy</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Grammar Name</th>
+                                    <th>Production Form</th>
+                                    <th>Language Class</th>
+                                    <th>Recognizer</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Type 0</td>
+                                    <td>Unrestricted</td>
+                                    <td>alpha -> beta (no restrictions)</td>
+                                    <td>Recursively Enumerable</td>
+                                    <td>Turing Machine</td>
+                                </tr>
+                                <tr>
+                                    <td>Type 1</td>
+                                    <td>Context-Sensitive</td>
+                                    <td>alpha A beta -> alpha gamma beta, |gamma| >= 1</td>
+                                    <td>Context-Sensitive</td>
+                                    <td>Linear Bounded Automata</td>
+                                </tr>
+                                <tr>
+                                    <td>Type 2</td>
+                                    <td>Context-Free</td>
+                                    <td>A -> gamma</td>
+                                    <td>Context-Free</td>
+                                    <td>Pushdown Automata</td>
+                                </tr>
+                                <tr>
+                                    <td>Type 3</td>
+                                    <td>Regular</td>
+                                    <td>A -> aB or A -> a</td>
+                                    <td>Regular</td>
+                                    <td>Finite Automata</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Hierarchy Relationships</h3>
+                    <div class="diagram-container">
+                        <svg width="350" height="250" viewBox="0 0 350 250">
+                            <!-- Type 0 - outermost -->
+                            <ellipse cx="175" cy="125" rx="165" ry="115" fill="none" stroke="#1a365d" stroke-width="2"/>
+                            <text x="330" y="30" font-family="Georgia" font-size="11">Type 0</text>
+                            <text x="280" y="45" font-family="Georgia" font-size="9">(Recursively</text>
+                            <text x="280" y="56" font-family="Georgia" font-size="9">Enumerable)</text>
+
+                            <!-- Type 1 -->
+                            <ellipse cx="175" cy="135" rx="140" ry="90" fill="none" stroke="#2d3748" stroke-width="2"/>
+                            <text x="290" y="95" font-family="Georgia" font-size="11">Type 1</text>
+                            <text x="275" y="108" font-family="Georgia" font-size="9">(Context-</text>
+                            <text x="275" y="119" font-family="Georgia" font-size="9">Sensitive)</text>
+
+                            <!-- Type 2 -->
+                            <ellipse cx="175" cy="145" rx="110" ry="65" fill="none" stroke="#3182ce" stroke-width="2"/>
+                            <text x="260" y="155" font-family="Georgia" font-size="11">Type 2</text>
+                            <text x="255" y="168" font-family="Georgia" font-size="9">(Context-Free)</text>
+
+                            <!-- Type 3 - innermost -->
+                            <ellipse cx="175" cy="155" rx="70" ry="40" fill="none" stroke="#38a169" stroke-width="2"/>
+                            <text x="175" y="145" text-anchor="middle" font-family="Georgia" font-size="11">Type 3</text>
+                            <text x="175" y="160" text-anchor="middle" font-family="Georgia" font-size="9">(Regular)</text>
+                        </svg>
+                        <p class="diagram-caption">Figure 3.3: Chomsky Hierarchy - each inner class is a proper subset of outer classes</p>
+                    </div>
+
+                    <h3>Strict Containment</h3>
+                    <p>The containment is strict at each level. Languages that separate levels:</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Separation</th>
+                                <th>Example Language</th>
+                                <th>Explanation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>CFL but not Regular</td>
+                                <td>{a^n b^n : n >= 0}</td>
+                                <td>Requires matching count, impossible with finite memory</td>
+                            </tr>
+                            <tr>
+                                <td>CSL but not CFL</td>
+                                <td>{a^n b^n c^n : n >= 0}</td>
+                                <td>Requires matching three counts simultaneously</td>
+                            </tr>
+                            <tr>
+                                <td>RE but not CSL</td>
+                                <td>Diagonalization language</td>
+                                <td>Beyond scope of bounded tape</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="exam-tip-box">
+                        <div class="box-title">Exam Important Points</div>
+                        <ul>
+                            <li>Type 3 is a subset of Type 2 is a subset of Type 1 is a subset of Type 0</li>
+                            <li>Each automaton type exactly characterizes its language class</li>
+                            <li>Context-sensitive production rule: left side can have context (alpha, beta), but the variable A is replaced by something at least as long</li>
+                            <li>The language {a^n b^n c^n} is the classic separator between CFL and CSL</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Unit Summary -->
+                <section id="summary" class="unit-summary">
+                    <h2>Unit III Summary</h2>
+
+                    <h3>Key Results</h3>
+                    <ul class="key-results">
+                        <li>CFG generates exactly the context-free languages, recognized by PDA</li>
+                        <li>Regular grammars (right-linear or left-linear) generate exactly regular languages</li>
+                        <li>Every CFL can be generated by a grammar in CNF or GNF</li>
+                        <li>Chomsky hierarchy: Type 3 subset of Type 2 subset of Type 1 subset of Type 0</li>
+                        <li>Ambiguity is a property of grammars, not languages</li>
+                    </ul>
+
+                    <h3>Normal Forms Comparison</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Form</th>
+                                <th>Production Structure</th>
+                                <th>Main Use</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>CNF</td>
+                                <td>A -> BC or A -> a</td>
+                                <td>CYK parsing, prove pumping lemma</td>
+                            </tr>
+                            <tr>
+                                <td>GNF</td>
+                                <td>A -> a alpha (terminal first)</td>
+                                <td>PDA construction, predictive parsing</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Algorithms to Know</h3>
+                    <ul>
+                        <li>DFA/NFA to right-linear grammar conversion</li>
+                        <li>Right-linear grammar to NFA conversion</li>
+                        <li>CFG simplification (remove useless, epsilon, unit productions)</li>
+                        <li>Conversion to CNF</li>
+                    </ul>
+
+                    <h3>Common Mistakes to Avoid</h3>
+                    <ul class="common-mistakes">
+                        <li>Mixing left-linear and right-linear productions (not necessarily regular)</li>
+                        <li>Confusing grammar ambiguity with language ambiguity</li>
+                        <li>Order of simplification steps (generating before reachable)</li>
+                        <li>Forgetting to handle all nullable combinations when eliminating epsilon</li>
+                        <li>Not creating new variables for terminals when converting to CNF</li>
+                    </ul>
+                </section>
+
+            </article>
+        </div>
+    </main>
+
+    <footer class="page-footer">
+        <p>TAFL Study Guide - Unit III: Regular and Non-Regular Grammars</p>
+        <p><a href="unit2.html">Previous: Unit II</a> | <a href="unit4.html">Next: Unit IV</a></p>
+    </footer>
+</body>
+</html>
